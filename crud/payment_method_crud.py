@@ -1,21 +1,24 @@
-from ..models.payment_method_model import PaymentMethod
+from models.payment_method_model import PaymentMethod
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException, Depends
 from sqlalchemy.future import select
-from ..schema.payment_method_schema import (
+from schema.payment_method_schema import (
     PaymentMethodCreate,
     PaymentMethodUpdate,
     PaymentMethodInDB,
 )
-from ..db.session import get_db
+from db.session import get_db
 
 
-async def create_payment_method(payment_method: PaymentMethodCreate):
+async def create_payment_method(
+    payment_method: PaymentMethodCreate, session: AsyncSession
+):
     """Creates a new payment method"""
-    async with get_db() as session:
-        new_payment_method = PaymentMethod(**payment_method.model_dump())
-        session.add(new_payment_method)
-        await session.commit()
-        await session.refresh(new_payment_method)
-        return new_payment_method
+    new_payment_method = PaymentMethod(**payment_method.model_dump())
+    session.add(new_payment_method)
+    await session.commit()
+    await session.refresh(new_payment_method)
+    return new_payment_method
 
 
 async def get_payment_methods():
@@ -40,6 +43,11 @@ async def update_payment_method(id: str, payment_method: PaymentMethodUpdate):
         result = await session.execute(
             select(PaymentMethod).filter(PaymentMethod.id == id)
         )
+        if not result.scalars().first():
+            raise HTTPException(
+                status_code=404,
+                detail="Payment method not found",
+            )
         payment_method_db = result.scalar_one()
         for key, value in payment_method.model_dump().items():
             setattr(payment_method_db, key, value)
@@ -54,6 +62,11 @@ async def delete_payment_method(id: str):
         result = await session.execute(
             select(PaymentMethod).filter(PaymentMethod.id == id)
         )
+        if not result.scalars().first():
+            raise HTTPException(
+                status_code=404,
+                detail="Payment method not found",
+            )
         payment_method = result.scalar_one()
         session.delete(payment_method)
         await session.commit()
