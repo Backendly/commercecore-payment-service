@@ -12,6 +12,6 @@ class ModelBase:
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=None,
+        default=datetime.now,
         onupdate=datetime.now,
     )
