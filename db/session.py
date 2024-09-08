@@ -10,16 +10,17 @@ load_dotenv()
 
 Database_URL = os.getenv("DATABASE_URL")
 engine = create_async_engine(Database_URL, echo=True)
-DBSession = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+AsyncSessionLocal = sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 
 def get_db():
     """Returns a new session"""
-    db = DBSession()
-    try:
-        yield db
-    finally:
-        db.close()
+    with AsyncSessionLocal() as session:
+        yield session
 
 
 @asynccontextmanager
