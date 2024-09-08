@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from datetime import datetime
-from ..models.payment_method_model import PaymentMethodType
+from models.payment_method_model import PaymentMethodType
 
 
 class PaymentMethodBase(BaseModel):
@@ -19,7 +19,7 @@ class PaymentMethodUpdate(PaymentMethodBase):
 
 
 class PaymentMethodInDB(PaymentMethodBase):
-    id: int
+    id: str
     created_at: datetime
     updated_at: datetime
 
