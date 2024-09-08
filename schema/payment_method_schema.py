@@ -1,13 +1,7 @@
 from pydantic import BaseModel
-from enum import Enum
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict, Any
 from datetime import datetime
-
-
-class PaymentMethodType(Enum):
-    card = "card"
-    paypal = "paypal"
-    stripe = "stripe"
+from ..models.payment_method_model import PaymentMethodType
 
 
 class PaymentMethodBase(BaseModel):
