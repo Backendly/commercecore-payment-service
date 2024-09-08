@@ -2,13 +2,12 @@ from db.session import Base
 from db.base import ModelBase
 from enum import Enum
 from sqlalchemy import Column, String, Boolean, JSON, Enum as SQLEnum
-from datetime import datetime
-from uuid import uuid4
+from nanoid import generate
 
 
 def generate_id():
     """Generates a random id"""
-    id = f"pm_{str(uuid4())[:14]}"
+    id = f"pm_{str(generate())[:14]}"
     return id
 
 
