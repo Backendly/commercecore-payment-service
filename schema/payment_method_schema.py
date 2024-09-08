@@ -25,3 +25,9 @@ class PaymentMethodInDB(PaymentMethodBase):
 
     class Config:
         from_attributes = True
+
+
+class PaymentMethodReturn(BaseModel):
+    message: str
+    status_code: int
+    data: PaymentMethodInDB
