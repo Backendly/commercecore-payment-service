@@ -14,10 +14,31 @@ async def create_payment_method(
     payment_method: PaymentMethodCreate, session: AsyncSession
 ):
     """Creates a new payment method"""
+
+    if payment_method.method_type == "card":
+        card_details = payment_method.details
+        required_fields = ["card_number", "cvv", "expiry_date"]
+
+        for field in required_fields:
+            if field not in card_details:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Payment method details must contain a {field} field",
+                )
+
     new_payment_method = PaymentMethod(**payment_method.model_dump())
-    session.add(new_payment_method)
-    await session.commit()
-    await session.refresh(new_payment_method)
+
+    try:
+        session.add(new_payment_method)
+        await session.commit()
+        await session.refresh(new_payment_method)
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while creating the payment method.{e}",
+        )
+
     return new_payment_method
 
 
