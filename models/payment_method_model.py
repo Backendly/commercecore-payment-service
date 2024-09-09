@@ -1,5 +1,6 @@
 from db.session import Base
 from db.base import ModelBase
+from pydantic import BaseModel
 from enum import Enum
 from sqlalchemy import Column, String, Boolean, JSON, Enum as SQLEnum
 from nanoid import generate
