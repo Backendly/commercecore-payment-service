@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator, ValidationError
 from typing import Optional, Dict, Any
 from datetime import datetime
 from models.payment_method_model import PaymentMethodType
@@ -43,9 +43,11 @@ class ListingMeta(BaseModel):
 
 
 class ListingLink(BaseModel):
-    prev: str
+    prev: str | None
     self: str
-    next: str
+    next: str | None
+    first: str
+    last: str
 
 
 class PaymentMethodReturnListing(BaseModel):
