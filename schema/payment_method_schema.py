@@ -27,7 +27,28 @@ class PaymentMethodInDB(PaymentMethodBase):
         from_attributes = True
 
 
-class PaymentMethodReturn(BaseModel):
+class PaymentMethodReturnDetail(BaseModel):
+    data: PaymentMethodInDB
+    meta: Optional[Dict[str, Any]]
+    links: Optional[Dict[str, Any]]
+
+
+class ListingMeta(BaseModel):
     message: str
     status_code: int
-    data: PaymentMethodInDB
+    page: int
+    per_page: int
+    total_pages: int
+    total_items: int
+
+
+class ListingLink(BaseModel):
+    prev: str
+    self: str
+    next: str
+
+
+class PaymentMethodReturnListing(BaseModel):
+    links: ListingLink
+    meta: ListingMeta
+    data: list[PaymentMethodInDB]
