@@ -5,13 +5,32 @@ from pydantic import ValidationError
 from routes.payment_method_routes import router as payment_method_router
 
 
-app = FastAPI(lifespan=create_all_tables)
+app = FastAPI(lifespan=create_all_tables, docs_url="/api/v1/docs", redoc_url=None)
 app.include_router(payment_method_router)
 
 
-@app.exception_handler(ValidationError)
-async def handle_validation_exception(request: Request, exc: ValidationError):
+@app.exception_handler(422)
+async def handle_validation_exception(request: Request, exc):
     return JSONResponse(
         status_code=422,
         content={"description": exc.errors()},
+    )
+
+
+@app.exception_handler(404)
+async def handle_not_found_exception(request: Request, exc):
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": "Resource not found",
+            "meta": {
+                "success": False,
+                "status_code": 404,
+                "request_method": str(request.method),
+                "request_path": str(request.url),
+            },
+            "details": {
+                "message": str(exc),
+            },
+        },
     )
