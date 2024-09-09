@@ -13,7 +13,6 @@ from crud.payment_method_crud import (
 )
 from schema.payment_method_schema import (
     PaymentMethodCreate,
-    PaymentMethodUpdate,
     PaymentMethodInDB,
     PaymentMethodReturnDetail,
     PaymentMethodReturnListing,
@@ -76,13 +75,15 @@ async def retrieve_payment_methods(
     base_url = str(request.url).split("?")[0]
 
     links = ListingLink(
-        prev=f"{base_url}?page={page - 1}&per_page={per_page}" if page > 1 else "",
+        prev=f"{base_url}?page={page - 1}&per_page={per_page}" if page > 1 else None,
         self=f"{base_url}?page={page}&per_page={per_page}",
         next=(
             f"{base_url}?page={page + 1}&per_page={per_page}"
             if page < total_pages
-            else ""
+            else None
         ),
+        first=f"{base_url}?page=1&per_page={per_page}",
+        last=f"{base_url}?page={total_pages}&per_page={per_page}",
     )
     meta = ListingMeta(
         message="Payment methods retrieved successfully",
