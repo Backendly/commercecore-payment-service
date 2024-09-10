@@ -13,6 +13,7 @@ async def create_payment_method(
     payment_method: PaymentMethodCreate, session: AsyncSession
 ):
     """Creates a new payment method"""
+
     new_payment_method = PaymentMethod(**payment_method.model_dump())
 
     try:
@@ -26,13 +27,30 @@ async def create_payment_method(
             detail=f"An error occurred while creating the payment method.{e}",
         )
 
-    return new_payment_method
+    result = new_payment_method
+    result = PaymentMethodInDB.model_validate(result)
+    result = result.model_dump()
+    del result["details"]["card_cvc"]
+    result["details"]["card_last_four"] = result["details"]["card_number"][-4:]
+    del result["details"]["card_number"]
+
+    return PaymentMethodInDB(**result)
 
 
 async def get_payment_methods(session: AsyncSession, limit: int, offset: int):
     """Returns all payment methods"""
     result = await session.execute(select(PaymentMethod).limit(limit).offset(offset))
-    return result.scalars().all()
+    results = result.scalars().all()
+    new_results = []
+    for result in results:
+        result = PaymentMethodInDB.model_validate(result)
+        result = result.model_dump()
+        del result["details"]["card_cvc"]
+        result["details"]["card_last_four"] = result["details"]["card_number"][-4:]
+        del result["details"]["card_number"]
+        new_results.append(result)
+
+    return new_results
 
 
 async def get_payment_method(id: str, session: AsyncSession):
@@ -46,21 +64,27 @@ async def get_payment_method(id: str, session: AsyncSession):
             status_code=404,
             detail="Payment method not found",
         )
-    return payment_method
+    result = payment_method
+    result = PaymentMethodInDB.model_validate(result)
+    result = result.model_dump()
+    del result["details"]["card_cvc"]
+    result["details"]["card_last_four"] = result["details"]["card_number"][-4:]
+    del result["details"]["card_number"]
+
+    return PaymentMethodInDB(**result)
 
 
-async def delete_payment_method(id: str):
+async def delete_payment_method(id: str, session: AsyncSession):
     """Deletes a payment method"""
-    async with get_db() as session:
-        result = await session.execute(
-            select(PaymentMethod).filter(PaymentMethod.id == id)
+    payment_method = await get_payment_method(id, session)
+    if not payment_method:
+        raise HTTPException(
+            status_code=404,
+            detail="Payment method not found",
         )
-        if not result.scalars().first():
-            raise HTTPException(
-                status_code=404,
-                detail="Payment method not found",
-            )
-        payment_method = result.scalar_one()
-        session.delete(payment_method)
-        await session.commit()
-        return payment_method
+    payment_method = await session.execute(
+        select(PaymentMethod).filter(PaymentMethod.id == id)
+    )
+    payment_method = payment_method.scalars().first()
+    await session.delete(payment_method)
+    await session.commit()
