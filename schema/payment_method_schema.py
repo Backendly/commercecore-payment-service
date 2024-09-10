@@ -15,12 +15,15 @@ class PaymentMethodCreate(PaymentMethodBase):
     @classmethod
     def check_for_required_details(cls, values):
         details = values.get("details")
+        if not details:
+            raise ValueError("details is required")
         method_type = values.get("method_type")
+        if not method_type:
+            raise ValueError("method_type is required")
         if method_type == "card":
             required_fields = [
                 "card_number",
-                "expiry_month",
-                "expiry_year",
+                "expiry_date",
                 "card_cvc",
                 "card_type",
             ]
