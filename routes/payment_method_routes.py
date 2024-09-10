@@ -116,3 +116,16 @@ async def retrieve_payment_method(
             "self": self_link,
         },
     }
+
+
+@router.delete("/payment-methods/{id}")
+async def remove_payment_method(
+    id: str,
+    session: AsyncSession = Depends(get_db),
+):
+    """Deletes a payment method"""
+    await delete_payment_method(id=id, session=session)
+    return {
+        "message": "Payment method deleted successfully",
+        "status_code": 200,
+    }
