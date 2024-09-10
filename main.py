@@ -13,7 +13,35 @@ app.include_router(payment_method_router)
 async def handle_validation_exception(request: Request, exc):
     return JSONResponse(
         status_code=422,
-        content={"description": exc.errors()},
+        content={
+            "error": "Validation Error",
+            "meta": {
+                "success": False,
+                "status_code": 422,
+                "request_method": str(request.method),
+                "request_path": str(request.url),
+            },
+            "details": {"message": exc.errors()},
+        },
+    )
+
+
+@app.exception_handler(500)
+async def handle_internal_server_exception(request: Request, exc):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal Server Error",
+            "meta": {
+                "success": False,
+                "status_code": 500,
+                "request_method": str(request.method),
+                "request_path": str(request.url),
+            },
+            "details": {
+                "message": str(exc),
+            },
+        },
     )
 
 
