@@ -1,19 +1,32 @@
 from models.payment_method_model import PaymentMethod
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from sqlalchemy.future import select
 from schema.payment_method_schema import (
     PaymentMethodCreate,
     PaymentMethodInDB,
+    PaymentMethodType,
 )
-from db.session import get_db
 
 
 async def create_payment_method(
     payment_method: PaymentMethodCreate, session: AsyncSession
 ):
     """Creates a new payment method"""
-
+    payment_method_dict = payment_method.model_dump()
+    if payment_method_dict.get("method_type") is PaymentMethodType.card:
+        card = payment_method_dict.get("details").get("card_number")
+        if card:
+            smt = select(PaymentMethod).filter(
+                PaymentMethod.details["card_number"] == card
+            )
+            result = await session.execute(smt)
+            payment_method_db = result.scalars().first()
+            if payment_method_db:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Card already exists",
+                )
     new_payment_method = PaymentMethod(**payment_method.model_dump())
 
     try:
