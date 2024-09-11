@@ -2,7 +2,6 @@ from pydantic import BaseModel, model_validator, ValidationError, ValidationInfo
 from typing import Optional, Dict, Any
 from datetime import datetime
 from models.payment_method_model import PaymentMethodType
-from pydantic import Field
 
 
 class PaymentMethodBase(BaseModel):
@@ -28,6 +27,16 @@ class PaymentMethodCreate(PaymentMethodBase):
                 "card_type",
             ]
             for field in required_fields:
+                if field is "card_number":
+                    if (
+                        len(str(details.get(field))) < 13
+                        or len(str(details.get(field))) > 19
+                    ):
+                        raise ValueError("card_number must be between 13 and 19 digits")
+
+                    if not details.get(field).isdigit():
+                        raise ValueError("card_number must be all digits")
+
                 if field not in details.keys():
                     raise ValueError(f"{field} is required for card payment")
         return values
@@ -35,7 +44,7 @@ class PaymentMethodCreate(PaymentMethodBase):
 
 class PaymentMethodInDB(PaymentMethodBase):
     id: str
-    created_at: datetime = Field
+    created_at: datetime
     updated_at: datetime
     is_active: bool
 

@@ -8,7 +8,7 @@ from nanoid import generate
 
 def generate_id():
     """Generates a random id"""
-    id = f"pm_{str(generate())[:14]}"
+    id = f"pm_{str(generate())[:25]}"
     return id
 
 
