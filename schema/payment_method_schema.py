@@ -2,6 +2,7 @@ from pydantic import BaseModel, model_validator, ValidationError, ValidationInfo
 from typing import Optional, Dict, Any
 from datetime import datetime
 from models.payment_method_model import PaymentMethodType
+import re
 
 
 class PaymentMethodBase(BaseModel):
@@ -27,18 +28,54 @@ class PaymentMethodCreate(PaymentMethodBase):
                 "card_type",
             ]
             for field in required_fields:
-                if field is "card_number":
-                    if (
-                        len(str(details.get(field))) < 13
-                        or len(str(details.get(field))) > 19
-                    ):
-                        raise ValueError("card_number must be between 13 and 19 digits")
-
-                    if not details.get(field).isdigit():
-                        raise ValueError("card_number must be all digits")
-
                 if field not in details.keys():
                     raise ValueError(f"{field} is required for card payment")
+        return values
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_expiry_date(cls, values):
+        details = values.get("details")
+        if not details:
+            raise ValueError("details is required")
+        method_type = values.get("method_type")
+        if method_type == "card" and details.get("expiry_date") is not None:
+            expiry_date = details.get("expiry_date")
+            if not re.match(r"^(0[1-9]|1[0-2])\/\d{2}$", expiry_date):
+                raise ValueError("expiry_date must be in MM/YY format")
+        return values
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_card_number(cls, values):
+        details = values.get("details")
+        if not details:
+            raise ValueError("details is required")
+        method_type = values.get("method_type")
+        if not details.get("card_number"):
+            raise ValueError("card_number is required for card payment")
+
+        if method_type == "card" and details.get("card_number") is not None:
+            card_number = details.get("card_number")
+            if card_number and not card_number.isdigit():
+                raise ValueError("card_number must be all digits")
+        return values
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_card_number_length(cls, values):
+        details = values.get("details")
+        if not details:
+            raise ValueError("details is required")
+        if not details.get("card_number"):
+            raise ValueError("card_number required for card payment")
+        method_type = values.get("method_type")
+        if method_type == "card" and details.get("card_number") is not None:
+            card_number = details.get("card_number")
+            if card_number and (
+                len(str(card_number)) < 13 or len(str(card_number)) > 19
+            ):
+                raise ValueError("card_number must be between 13 and 19 digits")
         return values
 
 
