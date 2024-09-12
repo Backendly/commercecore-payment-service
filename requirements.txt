@@ -4,6 +4,7 @@ alembic==1.13.2
 annotated-types==0.7.0
 anyio==4.4.0
 asgi-lifespan==2.1.0
+async-timeout==4.0.3
 attrs==24.2.0
 certifi==2024.8.30
 cffi==1.17.1
@@ -46,6 +47,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-multipart==0.0.9
 PyYAML==6.0.2
+redis==5.0.8
 requests==2.32.3
 rich==13.8.0
 shellingham==1.5.4
