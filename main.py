@@ -3,10 +3,19 @@ from fastapi.responses import JSONResponse
 from db.session import create_all_tables
 from pydantic import ValidationError
 from routes.payment_method_routes import router as payment_method_router
+from routes.transaction_routes import router as transaction_router
+from routes.account_routes import router as account_router
 
-
-app = FastAPI(lifespan=create_all_tables, docs_url="/api/v1/docs", redoc_url=None)
+app = FastAPI(
+    lifespan=create_all_tables,
+    docs_url="/api/v1/docs",
+    redoc_url=None,
+    title="CommerceCore Payment Microservce",
+    version="1.0.0",
+)
 app.include_router(payment_method_router)
+app.include_router(transaction_router)
+app.include_router(account_router)
 
 
 async def error_response_structure(
