@@ -15,7 +15,7 @@ router = APIRouter(tags=["Transactions"], prefix="/api/v1")
 
 
 @router.post(
-    "/payments",
+    "/transactions",
     response_model=InitiatePaymentTransactionResponse,
     status_code=201,
 )
@@ -36,7 +36,7 @@ async def initiate_transaction(
     return InitiatePaymentTransactionResponse(links=links, meta=meta, data=real_data)
 
 
-@router.post("/payments/confirm", response_model=ConfirmPaymentTransactionResponse)
+@router.post("/transactions/confirm", response_model=ConfirmPaymentTransactionResponse)
 async def confirm_transaction(data: Request, session: AsyncSession = Depends(get_db)):
     """Confirms a payment transaction"""
     data_response = await payment_confirmation(data=data, session=session)

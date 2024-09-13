@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from schema.transaction_schema import (
     ConnectedAccountResponse,
 )
-from crud.transaction_crud import (
+from crud.account_crud import (
     create_connected_account,
     continue_onboarding,
 )
@@ -40,5 +40,7 @@ async def connected_account_onboarding(
     }
 
     meta = {"status_code": 201}
-
+    onboarding_url = data_response["onboarding_url"]
+    del data_response["onboarding_url"]
+    links["onboarding_url"] = onboarding_url
     return ConnectedAccountResponse(links=links, meta=meta, data=data_response)
