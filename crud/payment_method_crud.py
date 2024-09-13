@@ -1,4 +1,5 @@
 from models.payment_method_model import PaymentMethod
+from services.stripe_config import stripe
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from sqlalchemy.future import select
@@ -14,20 +15,35 @@ async def create_payment_method(
 ):
     """Creates a new payment method"""
     payment_method_dict = payment_method.model_dump()
-    if payment_method_dict.get("method_type") is PaymentMethodType.card:
-        card = payment_method_dict.get("details").get("card_number")
-        if card:
-            smt = select(PaymentMethod).filter(
-                PaymentMethod.details["card_number"] == card
+    payment_method_type = payment_method_dict["type"]
+    payment_method_details = payment_method_dict["details"]
+
+    if payment_method_type == PaymentMethodType.card:
+        try:
+            payment_method_stripe = await stripe.PaymentMethod.create(
+                type="card",
+                card={
+                    "number": payment_method_details["card_number"],
+                    "exp_month": payment_method_details["exp_month"],
+                    "exp_year": payment_method_details["exp_year"],
+                    "cvc": payment_method_details["card_cvc"],
+                },
             )
-            result = await session.execute(smt)
-            payment_method_db = result.scalars().first()
-            if payment_method_db:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Card already exists",
-                )
-    new_payment_method = PaymentMethod(**payment_method.model_dump())
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"An error occurred while creating the payment method.{e}",
+            )
+        new_payment_method = PaymentMethod(
+            id=payment_method_stripe["id"],
+            type=payment_method_type,
+            details={
+                "card_last_four": payment_method_stripe["last4"],
+                "card_type": payment_method_stripe["brand"],
+                "exp_month": payment_method_stripe["exp_month"],
+                "exp_year": payment_method_stripe["exp_year"],
+            },
+        )
 
     try:
         session.add(new_payment_method)
@@ -40,14 +56,7 @@ async def create_payment_method(
             detail=f"An error occurred while creating the payment method.{e}",
         )
 
-    result = new_payment_method
-    result = PaymentMethodInDB.model_validate(result)
-    result = result.model_dump()
-    del result["details"]["card_cvc"]
-    result["details"]["card_last_four"] = result["details"]["card_number"][-4:]
-    del result["details"]["card_number"]
-
-    return PaymentMethodInDB(**result)
+    return new_payment_method
 
 
 async def get_payment_methods(session: AsyncSession, limit: int, offset: int):
