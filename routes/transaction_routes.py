@@ -6,8 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from crud.transaction_crud import (
     initiate_payment_transaction,
     payment_confirmation,
-    create_connected_account,
-    continue_onboarding,
 )
 from fastapi import APIRouter, Depends, Request
 from db.session import get_db
@@ -17,11 +15,13 @@ router = APIRouter(tags=["Transactions"], prefix="/api/v1")
 
 
 @router.post(
-    "/payments/initiate",
+    "/payments",
     response_model=InitiatePaymentTransactionResponse,
     status_code=201,
 )
-async def initiate_payment(payment: Request, session: AsyncSession = Depends(get_db)):
+async def initiate_transaction(
+    payment: Request, session: AsyncSession = Depends(get_db)
+):
     data = await initiate_payment_transaction(payment=payment, session=session)
     real_data = data.model_dump()
 
@@ -37,7 +37,7 @@ async def initiate_payment(payment: Request, session: AsyncSession = Depends(get
 
 
 @router.post("/payments/confirm", response_model=ConfirmPaymentTransactionResponse)
-async def confirm_payment(data: Request, session: AsyncSession = Depends(get_db)):
+async def confirm_transaction(data: Request, session: AsyncSession = Depends(get_db)):
     """Confirms a payment transaction"""
     data_response = await payment_confirmation(data=data, session=session)
 
