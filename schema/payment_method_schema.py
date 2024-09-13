@@ -6,7 +6,7 @@ import re
 
 
 class PaymentMethodBase(BaseModel):
-    method_type: PaymentMethodType
+    type: PaymentMethodType
     details: Dict[str, Any]
 
 
@@ -17,15 +17,15 @@ class PaymentMethodCreate(PaymentMethodBase):
         details = values.get("details")
         if not details:
             raise ValueError("details is required")
-        method_type = values.get("method_type")
-        if not method_type:
+        type = values.get("type")
+        if not type:
             raise ValueError("method_type is required")
-        if method_type == "card":
+        if type == "card":
             required_fields = [
                 "card_number",
-                "expiry_date",
+                "exp_month",
+                "exp_year",
                 "card_cvc",
-                "card_type",
             ]
             for field in required_fields:
                 if field not in details.keys():
@@ -38,8 +38,8 @@ class PaymentMethodCreate(PaymentMethodBase):
         details = values.get("details")
         if not details:
             raise ValueError("details is required")
-        method_type = values.get("method_type")
-        if method_type == "card" and details.get("expiry_date") is not None:
+        type = values.get("type")
+        if type == "card" and details.get("expiry_date") is not None:
             expiry_date = details.get("expiry_date")
             if not re.match(r"^(0[1-9]|1[0-2])\/\d{2}$", expiry_date):
                 raise ValueError("expiry_date must be in MM/YY format")
@@ -51,11 +51,11 @@ class PaymentMethodCreate(PaymentMethodBase):
         details = values.get("details")
         if not details:
             raise ValueError("details is required")
-        method_type = values.get("method_type")
+        type = values.get("type")
         if not details.get("card_number"):
             raise ValueError("card_number is required for card payment")
 
-        if method_type == "card" and details.get("card_number") is not None:
+        if type == "card" and details.get("card_number") is not None:
             card_number = details.get("card_number")
             if card_number and not card_number.isdigit():
                 raise ValueError("card_number must be all digits")
@@ -69,8 +69,8 @@ class PaymentMethodCreate(PaymentMethodBase):
             raise ValueError("details is required")
         if not details.get("card_number"):
             raise ValueError("card_number required for card payment")
-        method_type = values.get("method_type")
-        if method_type == "card" and details.get("card_number") is not None:
+        type = values.get("type")
+        if type == "card" and details.get("card_number") is not None:
             card_number = details.get("card_number")
             if card_number and (
                 len(str(card_number)) < 13 or len(str(card_number)) > 19
@@ -116,3 +116,9 @@ class PaymentMethodReturnListing(BaseModel):
     links: ListingLink
     meta: ListingMeta
     data: list[PaymentMethodInDB]
+
+
+class InitiatePaymentTransaction(BaseModel):
+    order_details: Dict[str, Any]
+    payment_method_id: str
+    developer_id: str
