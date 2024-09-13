@@ -1,15 +1,10 @@
 from fastapi import APIRouter, Depends, Request
 from db.session import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Annotated, Dict
 from schema.transaction_schema import (
-    InitiatePaymentTransactionResponse,
-    ConfirmPaymentTransactionResponse,
     ConnectedAccountResponse,
 )
 from crud.transaction_crud import (
-    initiate_payment_transaction,
-    payment_confirmation,
     create_connected_account,
     continue_onboarding,
 )
