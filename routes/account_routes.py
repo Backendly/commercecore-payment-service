@@ -7,6 +7,7 @@ from schema.transaction_schema import (
 from crud.account_crud import (
     create_connected_account,
     continue_onboarding,
+    login_link,
 )
 
 
@@ -43,4 +44,18 @@ async def connected_account_onboarding(
     onboarding_url = data_response["onboarding_url"]
     del data_response["onboarding_url"]
     links["onboarding_url"] = onboarding_url
+    return ConnectedAccountResponse(links=links, meta=meta, data=data_response)
+
+
+@router.post("/connected-accounts/login", status_code=201)
+async def connected_account_login(
+    data: Request, session: AsyncSession = Depends(get_db)
+):
+    """login link"""
+    data_response = await login_link(data=data, session=session)
+    links = {
+        "self": str(data.url),
+    }
+
+    meta = {"status_code": 201}
     return ConnectedAccountResponse(links=links, meta=meta, data=data_response)
