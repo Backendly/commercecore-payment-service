@@ -1,6 +1,5 @@
 from db.session import Base
 from db.base import ModelBase
-from pydantic import BaseModel
 from enum import Enum
 from sqlalchemy import Column, String, Boolean, JSON, Enum as SQLEnum
 from nanoid import generate
@@ -20,9 +19,9 @@ class PaymentMethodType(Enum):
 
 class PaymentMethod(ModelBase, Base):
     __tablename__ = "payment_methods"
-    id = Column(String(255), primary_key=True, default=generate_id, index=True)
+    id = Column(String(255), primary_key=True, nullable=True)
     is_active = Column(Boolean, default=True)
-    method_type = Column(
+    type = Column(
         SQLEnum(PaymentMethodType, name="payment_method_types"),
         nullable=False,
     )
