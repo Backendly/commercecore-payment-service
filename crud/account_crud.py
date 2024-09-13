@@ -47,6 +47,12 @@ async def create_connected_account(data: Request, session: AsyncSession):
                 "losses": {"payments": "application"},
                 "stripe_dashboard": {"type": "express"},
             },
+            capabilities={
+                "card_payments": {"requested": True},
+                "transfers": {"requested": True},
+                "bank_transfer_payments": {"requested": True},
+                "link_payments": {"requested": True},
+            },
             metadata={"developer_id": developer_id},
         )
     except Exception as e:
@@ -70,3 +76,19 @@ async def create_connected_account(data: Request, session: AsyncSession):
         "message": f"Connected account created successfully onboarding link expires in {date} hours"
         f" use the 'onboarding_url' to complete the onboarding",
     }
+
+
+async def login_link(data: Request, session: AsyncSession):
+    """Creates a login link"""
+    data = await data.json()
+    account_id = data["account_id"]
+
+    try:
+        login_link = stripe.Account.create_login_link(account=account_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while creating the login link.{e}",
+        )
+
+    return {"login_url": login_link.url}
