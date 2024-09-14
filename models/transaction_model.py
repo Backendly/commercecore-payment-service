@@ -1,5 +1,5 @@
 from db.base import Base, ModelBase
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String
 
 
 class Transaction(ModelBase, Base):
@@ -9,5 +9,6 @@ class Transaction(ModelBase, Base):
     payment_method_id = Column(String(255), nullable=True)
     developer_id = Column(String(255), nullable=False)
     user_id = Column(String(225), nullable=False)
+    app_id = Column(String(255), nullable=False)
     amount = Column(String(255), nullable=False)
     status = Column(String(255), nullable=False)
