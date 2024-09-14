@@ -5,6 +5,7 @@ from pydantic import ValidationError
 from routes.payment_method_routes import router as payment_method_router
 from routes.transaction_routes import router as transaction_router
 from routes.account_routes import router as account_router
+from routes.refunds_routes import router as refunds_router
 
 app = FastAPI(
     lifespan=create_all_tables,
@@ -16,6 +17,7 @@ app = FastAPI(
 app.include_router(payment_method_router)
 app.include_router(transaction_router)
 app.include_router(account_router)
+app.include_router(refunds_router)
 
 
 async def error_response_structure(
