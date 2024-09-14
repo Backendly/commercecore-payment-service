@@ -15,4 +15,4 @@ async def request_refund(request: Request, session: AsyncSession = Depends(get_d
     links = {"self": request.url}
     meta = {"status": "success", "message": "Refund request created successfully"}
 
-    return RefundReturnDetail(refund=refund, links=links, meta=meta)
+    return RefundReturnDetail(data=refund, links=links, meta=meta)
