@@ -16,13 +16,14 @@ async def initiate_payment_transaction(payment: Request, session: AsyncSession):
     developer_id = data["developer_id"]
     user_id = data["user_id"]
     developer_stripe_account = data["account_id"]
+    app_id = data["app_id"]
 
     try:
         payment_intent = stripe.PaymentIntent.create(
             amount=amount,
             currency="usd",
             payment_method_types=["card"],
-            metadata={"order_id": order_id},
+            metadata={"order_id": order_id, "app_id": app_id},
             stripe_account=developer_stripe_account,
         )
     except Exception as e:
@@ -37,6 +38,7 @@ async def initiate_payment_transaction(payment: Request, session: AsyncSession):
         payment_method_id=None,
         developer_id=developer_id,
         user_id=user_id,
+        app_id=app_id,
         amount=amount,
         status="pending",
     )
@@ -103,3 +105,12 @@ async def payment_confirmation(data: Request, session: AsyncSession):
         "status_code": 200,
         "account_id": developer_stripe_account,
     }
+
+
+async def get_transactions(session: AsyncSession, limit: int, offset: int):
+    """Gets all transactions"""
+    transactions = await session.execute(
+        select(Transaction).limit(limit).offset(offset)
+    )
+    transactions = transactions.scalars().all()
+    return transactions
