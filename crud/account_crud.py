@@ -3,6 +3,7 @@ from typing import Any
 from services.stripe_config import stripe
 from fastapi import Request, HTTPException
 from datetime import datetime
+import os
 
 
 async def continue_onboarding(data: Request, session: AsyncSession):
@@ -37,6 +38,7 @@ async def create_connected_account(data: Request, session: AsyncSession):
     data = await data.json()
     developer_id = data["developer_id"]
     email = data["email"]
+    public_key = os.getenv("STRIPE_PUBLIC_KEY")
 
     try:
         account = stripe.Account.create(
@@ -73,6 +75,7 @@ async def create_connected_account(data: Request, session: AsyncSession):
     return {
         "onboarding_url": full_onboard_url.url,
         "account_id": account["id"],
+        "public_key": public_key,
         "message": f"Connected account created successfully onboarding link expires in {date} hours"
         f" use the 'onboarding_url' to complete the onboarding",
     }
