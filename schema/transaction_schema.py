@@ -4,13 +4,14 @@ from models.transaction_model import Transaction
 
 
 class TransactionBase(BaseModel):
-    transaction_id: str
-    user_id: str
-    order_id: str
-    payment_method_id: str
-    developer_id: str
-    amount: str
-    status: str
+    transaction_id: str | None
+    user_id: str | None
+    order_id: str | None
+    payment_method_id: str | None
+    app_id: str | None
+    developer_id: str | None
+    amount: str | None
+    status: str | None
 
 
 class TransactionCreate(TransactionBase):
