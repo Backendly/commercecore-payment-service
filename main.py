@@ -2,10 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from db.session import create_all_tables
 from pydantic import ValidationError
-from routes.payment_method_routes import router as payment_method_router
-from routes.transaction_routes import router as transaction_router
-from routes.account_routes import router as account_router
-from routes.refunds_routes import router as refunds_router
+from starlette.middleware.base import BaseHTTPMiddleware
+from api.v1 import (
+    account_router,
+    refunds_router,
+    payment_method_router,
+    transaction_router,
+)
 
 app = FastAPI(
     lifespan=create_all_tables,
