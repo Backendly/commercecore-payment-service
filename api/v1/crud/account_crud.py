@@ -1,42 +1,21 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
 from services.stripe_config import stripe
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, Depends
 from datetime import datetime
+from utils import validate_developer
+from typing import Dict
 import os
 
 
-async def continue_onboarding(data: Request, session: AsyncSession):
-    """Continues the onboarding process"""
-    data = await data.json()
-    account_id = data["account_id"]
-
-    try:
-        onboarding = stripe.AccountLink.create(
-            account=account_id,
-            refresh_url="http://localhost:8000",
-            return_url="http://localhost:8000",
-            type="account_onboarding",
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An error occurred while creating the onboarding link.{e}",
-        )
-
-    timestamp = datetime.fromtimestamp(onboarding["expires_at"])
-    date = f"{timestamp.hour}"
-    return {
-        "onboarding_url": onboarding.url,
-        "message": f"Onboarding link expires in {date} hours use the"
-        f" 'onboarding_url' to complete the onboarding",
-    }
-
-
-async def create_connected_account(data: Request, session: AsyncSession):
+async def create_connected_account(
+    data: Request,
+    session: AsyncSession,
+    validated_developer: Dict[str, Any] = Depends(validate_developer),
+):
     """Creates a connected account"""
     data = await data.json()
-    developer_id = data["developer_id"]
+    developer_id = validated_developer["developer_id"]
     email = data["email"]
     public_key = os.getenv("STRIPE_PUBLIC_KEY")
 
@@ -78,6 +57,34 @@ async def create_connected_account(data: Request, session: AsyncSession):
         "public_key": public_key,
         "message": f"Connected account created successfully onboarding link expires in {date} hours"
         f" use the 'onboarding_url' to complete the onboarding",
+    }
+
+
+async def continue_onboarding(
+    data: Request,
+    session: AsyncSession,
+    validated_developer: Dict[str, Any] = Depends(validate_developer),
+):
+    """Continues the onboarding process"""
+    try:
+        onboarding = stripe.AccountLink.create(
+            account=account_id,
+            refresh_url="http://localhost:8000",
+            return_url="http://localhost:8000",
+            type="account_onboarding",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while creating the onboarding link.{e}",
+        )
+
+    timestamp = datetime.fromtimestamp(onboarding["expires_at"])
+    date = f"{timestamp.hour}"
+    return {
+        "onboarding_url": onboarding.url,
+        "message": f"Onboarding link expires in {date} hours use the"
+        f" 'onboarding_url' to complete the onboarding",
     }
 
 
