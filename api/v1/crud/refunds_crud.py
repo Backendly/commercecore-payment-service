@@ -1,4 +1,4 @@
-from schema.refunds_schema import RefundCreate, RefundInDB, RefundReturnDetail
+from ..schema.refunds_schema import RefundCreate, RefundInDB, RefundReturnDetail
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from sqlalchemy.future import select
