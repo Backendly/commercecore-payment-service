@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Request
 from db.session import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
-from schema.transaction_schema import (
+from ..schema.transaction_schema import (
     ConnectedAccountResponse,
 )
-from crud.account_crud import (
+from ..crud.account_crud import (
     create_connected_account,
     continue_onboarding,
     login_link,
