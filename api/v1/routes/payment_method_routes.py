@@ -5,13 +5,13 @@ from fastapi import HTTPException
 from sqlalchemy.future import select
 from sqlalchemy import func
 from typing import Annotated
-from crud.payment_method_crud import (
+from ..crud.payment_method_crud import (
     create_payment_method,
     get_payment_methods,
     get_payment_method,
     delete_payment_method,
 )
-from schema.payment_method_schema import (
+from ..schema.payment_method_schema import (
     PaymentMethodCreate,
     PaymentMethodInDB,
     PaymentMethodReturnDetail,
