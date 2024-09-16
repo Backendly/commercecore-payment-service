@@ -1,4 +1,4 @@
-from schema.transaction_schema import (
+from ..schema.transaction_schema import (
     InitiatePaymentTransactionResponse,
     ConfirmPaymentTransactionResponse,
     TransactionReturnListing,
@@ -7,7 +7,7 @@ from schema.transaction_schema import (
 )
 from models.transaction_model import Transaction
 from sqlalchemy.ext.asyncio import AsyncSession
-from crud.transaction_crud import (
+from ..crud.transaction_crud import (
     initiate_payment_transaction,
     payment_confirmation,
     get_transactions,
