@@ -4,7 +4,7 @@ from sqlalchemy.future import select
 from typing import Any
 from services.stripe_config import stripe
 from fastapi import Request, HTTPException
-from schema.transaction_schema import InitiatePaymentTransaction
+from ..schema.transaction_schema import InitiatePaymentTransaction
 
 
 async def initiate_payment_transaction(payment: Request, session: AsyncSession):
