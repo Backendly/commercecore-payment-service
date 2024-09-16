@@ -1,8 +1,8 @@
-from schema.refunds_schema import RefundInDB, RefundReturnDetail
+from ..schema.refunds_schema import RefundInDB, RefundReturnDetail
 from fastapi import APIRouter, Request, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.session import get_db
-from crud.refunds_crud import create_refund
+from ..crud.refunds_crud import create_refund
 
 
 router = APIRouter(tags=["Refunds"], prefix="/api/v1")
