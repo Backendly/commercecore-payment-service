@@ -3,7 +3,7 @@ from services.stripe_config import stripe
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from sqlalchemy.future import select
-from schema.payment_method_schema import (
+from ..schema.payment_method_schema import (
     PaymentMethodCreate,
     PaymentMethodInDB,
     PaymentMethodType,
