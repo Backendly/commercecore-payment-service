@@ -11,7 +11,7 @@ import os
 async def create_connected_account(
     data: Request,
     session: AsyncSession,
-    validated_developer: Dict[str, Any] = Depends(validate_developer),
+    validated_developer,
 ):
     """Creates a connected account"""
     data = await data.json()
@@ -66,6 +66,7 @@ async def continue_onboarding(
     validated_developer: Dict[str, Any] = Depends(validate_developer),
 ):
     """Continues the onboarding process"""
+    account_id = data.json().get("account_id")
     try:
         onboarding = stripe.AccountLink.create(
             account=account_id,
