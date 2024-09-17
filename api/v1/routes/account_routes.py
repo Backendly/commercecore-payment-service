@@ -9,15 +9,23 @@ from ..crud.account_crud import (
     continue_onboarding,
     login_link,
 )
+from utils import validate_developer
+from typing import Dict, Any
 
 
 router = APIRouter(tags=["Connected Accounts"], prefix="/api/v1")
 
 
 @router.post("/connected-accounts", status_code=201)
-async def connected_account(data: Request, session: AsyncSession = Depends(get_db)):
+async def connected_account(
+    data: Request,
+    session: AsyncSession = Depends(get_db),
+    validated_developer: Dict[str, Any] = Depends(validate_developer),
+):
     """create connected accounts"""
-    data_response = await create_connected_account(data=data, session=session)
+    data_response = await create_connected_account(
+        data=data, session=session, validated_developer=validated_developer
+    )
     onboarding_url = data_response["onboarding_url"]
     del data_response["onboarding_url"]
     links = {
