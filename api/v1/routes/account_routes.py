@@ -40,10 +40,14 @@ async def connected_account(
 
 @router.post("/connected-accounts/onboarding", status_code=201)
 async def connected_account_onboarding(
-    data: Request, session: AsyncSession = Depends(get_db)
+    data: Request,
+    session: AsyncSession = Depends(get_db),
+    validated_developer: Dict[str, Any] = Depends(validate_developer),
 ):
     """continue onboarding"""
-    data_response = await continue_onboarding(data=data, session=session)
+    data_response = await continue_onboarding(
+        data=data, session=session, validated_developer=validated_developer
+    )
     links = {
         "self": str(data.url),
     }
@@ -57,10 +61,14 @@ async def connected_account_onboarding(
 
 @router.post("/connected-accounts/login", status_code=201)
 async def connected_account_login(
-    data: Request, session: AsyncSession = Depends(get_db)
+    data: Request,
+    session: AsyncSession = Depends(get_db),
+    validated_developer: Dict[str, Any] = Depends(validate_developer),
 ):
     """login link"""
-    data_response = await login_link(data=data, session=session)
+    data_response = await login_link(
+        data=data, session=session, validated_developer=validate_developer
+    )
     links = {
         "self": str(data.url),
     }
