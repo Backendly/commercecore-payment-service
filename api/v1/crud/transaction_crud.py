@@ -5,6 +5,7 @@ from typing import Any
 from services.stripe_config import stripe
 from fastapi import Request, HTTPException
 from ..schema.transaction_schema import InitiatePaymentTransaction
+from utils import validate_developer, validate_user
 
 
 async def initiate_payment_transaction(payment: Request, session: AsyncSession):
@@ -14,7 +15,7 @@ async def initiate_payment_transaction(payment: Request, session: AsyncSession):
     amount = data["amount"]
     developer_id = data["developer_id"]
     user_id = data["user_id"]
-    developer_stripe_account = data["account_id"]
+    account_id = data["account_id"]
     app_id = data["app_id"]
 
     try:
@@ -23,7 +24,7 @@ async def initiate_payment_transaction(payment: Request, session: AsyncSession):
             currency="usd",
             payment_method_types=["card"],
             metadata={"order_id": order_id, "app_id": app_id},
-            stripe_account=developer_stripe_account,
+            stripe_account=account_id,
         )
     except Exception as e:
         raise HTTPException(
@@ -65,13 +66,13 @@ async def payment_confirmation(data: Request, session: AsyncSession):
     data = await data.json()
     transaction_id = data["transaction_id"]
     payment_method_id = data["payment_method_id"]
-    developer_stripe_account = data["account_id"]
+    account_id = data["account_id"]
 
     try:
         payment_intent = stripe.PaymentIntent.confirm(
             transaction_id,
             payment_method=payment_method_id,
-            stripe_account=developer_stripe_account,
+            stripe_account=account_id,
         )
     except Exception as e:
         raise HTTPException(
@@ -102,7 +103,7 @@ async def payment_confirmation(data: Request, session: AsyncSession):
     return {
         "message": "Payment confirmed successfully",
         "status_code": 200,
-        "account_id": developer_stripe_account,
+        "account_id": account_id,
     }
 
 
