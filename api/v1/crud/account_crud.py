@@ -6,16 +6,21 @@ from datetime import datetime
 from utils import validate_developer
 from typing import Dict
 import os
+from redis_db.redis_db import redis_instance
 
 
 async def create_connected_account(
     data: Request,
     session: AsyncSession,
-    validated_developer,
+    validated_developer: Dict[str, Any],
 ):
     """Creates a connected account"""
     data = await data.json()
-    developer_id = validated_developer["developer_id"]
+    developer_id = (
+        validated_developer["developer_id"]
+        if type(validated_developer) == dict
+        else validated_developer
+    )
     email = data["email"]
     public_key = os.getenv("STRIPE_PUBLIC_KEY")
 
@@ -63,10 +68,11 @@ async def create_connected_account(
 async def continue_onboarding(
     data: Request,
     session: AsyncSession,
-    validated_developer: Dict[str, Any] = Depends(validate_developer),
+    validated_developer: Dict[str, Any],
 ):
     """Continues the onboarding process"""
-    account_id = data.json().get("account_id")
+    data_collected = await data.json()
+    account_id = data_collected.get("account_id")
     try:
         onboarding = stripe.AccountLink.create(
             account=account_id,
@@ -89,7 +95,9 @@ async def continue_onboarding(
     }
 
 
-async def login_link(data: Request, session: AsyncSession):
+async def login_link(
+    data: Request, session: AsyncSession, validated_developer: Dict[str, Any]
+):
     """Creates a login link"""
     data = await data.json()
     account_id = data["account_id"]
