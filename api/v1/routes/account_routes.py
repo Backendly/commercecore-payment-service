@@ -11,6 +11,7 @@ from ..crud.account_crud import (
 )
 from utils import validate_developer
 from typing import Dict, Any
+from redis_db.redis_db import redis_instance
 
 
 router = APIRouter(tags=["Connected Accounts"], prefix="/api/v1")
@@ -20,11 +21,17 @@ router = APIRouter(tags=["Connected Accounts"], prefix="/api/v1")
 async def connected_account(
     data: Request,
     session: AsyncSession = Depends(get_db),
-    validated_developer: Dict[str, Any] = Depends(validate_developer),
 ):
     """create connected accounts"""
+    developer_id = None
+    if developer_id := data.headers.get("X-Developer-ID"):
+        developer_id = redis_instance.get(developer_id)
+    else:
+        developer_id = validate_developer(data)
+
+    # Add the developer_id to the data
     data_response = await create_connected_account(
-        data=data, session=session, validated_developer=validated_developer
+        data=data, session=session, developer_id=developer_id
     )
     onboarding_url = data_response["onboarding_url"]
     del data_response["onboarding_url"]
