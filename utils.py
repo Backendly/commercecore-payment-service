@@ -6,7 +6,7 @@ from backgrounds import store_user_data, store_developer_data
 
 
 key_developer_1 = "developer_{developer_id}{app_id}{user_id}"
-key_user_1 = "user_{develper_id}{app_id}{user_id}"
+key_user_1 = "user_{developer_id}{app_id}{user_id}"
 
 key_developer_2 = "developer_{developer_id}{app_id}"
 key_user_2 = "user_{user_id}{app_id}"
@@ -36,7 +36,7 @@ async def validate_developer(request: Request, background_tasks: BackgroundTasks
         if request.query_params.get("app_id"):
             params_developer["app_id"] = request.query_params.get("app_id")
         elif request.headers.get("X-App-ID"):
-            params_developer["app_id"] = request.headers.get("X-App-ID")
+            headers_developer["X-App-ID"] = request.headers.get("X-App-ID")
 
         response = await client.get(
             "confirm/developer/", headers=headers_developer, params=params_developer
@@ -80,6 +80,8 @@ async def validate_user(request: Request, background_tasks: BackgroundTasks):
             )
         if request.query_params.get("app_id"):
             params_user["app_id"] = request.query_params.get("app_id")
+        elif request.headers.get("X-App-ID"):
+            headers_user["X-App-ID"] = request.headers.get("X-App-ID")
         response = await client.get(
             "confirm/user/", headers=headers_user, params=params_user
         )
@@ -89,28 +91,34 @@ async def validate_user(request: Request, background_tasks: BackgroundTasks):
                 detail=f"Unauthorized, {response.json().get('message')}",
             )
         data = response.json()
-        key_developer_1 = key_developer_1.format(
+        formatted_key_developer_1 = key_developer_1.format(
             developer_id=headers_developer.get("X-Developer-ID"),
             app_id=params_user.get("app_id"),
             user_id=data.get("user_id"),
         )
-        key_user_1 = key_user_1.format(
+        formatted_key_user_1 = key_user_1.format(
             developer_id=headers_developer.get("X-Developer-ID"),
             app_id=params_user.get("app_id"),
             user_id=data.get("user_id"),
         )
-        key_user_2 = key_user_2.format(
-            developer_id=data.get("user_id"),
+        formatted_key_user_2 = key_user_2.format(
+            user_id=data.get("user_id"),
             app_id=data.get("app_id"),
         )
-        key_user_3 = key_user_3.format(user_id=data.get("user_id"))
+        formatted_key_user_3 = key_user_3.format(user_id=data.get("user_id"))
 
-        background_tasks.add_task(store_user_data, key_user_3, data["user_id"])
-        background_tasks.add_task(store_user_data, key_user_2, data["user_id"])
-        background_tasks.add_task(store_user_data, key_user_1, data["user_id"])
+        background_tasks.add_task(
+            store_user_data, formatted_key_user_3, data["user_id"]
+        )
+        background_tasks.add_task(
+            store_user_data, formatted_key_user_2, data["user_id"]
+        )
+        background_tasks.add_task(
+            store_user_data, formatted_key_user_1, data["user_id"]
+        )
         background_tasks.add_task(
             store_user_data,
-            key_developer_1,
+            formatted_key_developer_1,
             headers_developer.get("X-Developer-ID"),
         )
         return data
