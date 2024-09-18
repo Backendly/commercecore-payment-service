@@ -16,12 +16,6 @@ async def create_refund(
     validated_user: Dict[str, Any],
 ):
     """Creates a refund"""
-    query = refund.query_params
-    if not query.get("app_id"):
-        raise HTTPException(
-            400,
-            detail="Provide app_id as a query parameter",
-        )
     data = await refund.json()
     order_id = data["order_id"]
     account_id = data["account_id"]
@@ -37,8 +31,7 @@ async def create_refund(
             detail=f"Transaction with order_id {order_id} found.",
         )
 
-    transaction = transaction.scalars().first()
-    transaction_id = transaction.transaction_id
+    transaction_id = real_transaction.transaction_id
 
     try:
         refund_stripe = stripe.Refund.create(
@@ -55,7 +48,7 @@ async def create_refund(
     new_refund = Refund(
         refund_id=refund_stripe["id"],
         transaction_id=transaction_id,
-        user_id=transaction.user_id,
+        user_id=real_transaction.user_id,
         order_id=order_id,
         app_id=app_id,
         amount=refund_stripe["amount"],
