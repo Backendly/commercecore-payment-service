@@ -1,23 +1,26 @@
 from models.transaction_model import Transaction
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import Any
+from typing import Any, Dict
 from services.stripe_config import stripe
 from fastapi import Request, HTTPException
 from ..schema.transaction_schema import InitiatePaymentTransaction
-from utils import validate_developer, validate_user
 
 
-async def initiate_payment_transaction(payment: Request, session: AsyncSession):
+async def initiate_payment_transaction(
+    payment: Request,
+    session: AsyncSession,
+    validated_developer: Dict[str, Any],
+    validated_user: Dict[str, Any],
+):
     """Initiates a payment transaction"""
     data = await payment.json()
     order_id = data["order_id"]
     amount = data["amount"]
-    developer_id = data["developer_id"]
-    user_id = data["user_id"]
     account_id = data["account_id"]
-    app_id = data["app_id"]
-
+    app_id = validated_developer.get("app_id")
+    developer_id = validated_developer.get("developer_id")
+    user_id = validated_user.get("user_id")
     try:
         payment_intent = stripe.PaymentIntent.create(
             amount=amount,
