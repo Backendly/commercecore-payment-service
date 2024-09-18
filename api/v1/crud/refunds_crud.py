@@ -6,22 +6,35 @@ from models.refunds_model import Refund
 from fastapi import Request
 from services.stripe_config import stripe
 from models.transaction_model import Transaction
+from typing import Dict, Any
 
 
-async def create_refund(refund: Request, session: AsyncSession):
+async def create_refund(
+    refund: Request,
+    session: AsyncSession,
+    validated_developer: Dict[str, Any],
+    validated_user: Dict[str, Any],
+):
     """Creates a refund"""
+    query = refund.query_params
+    if not query.get("app_id"):
+        raise HTTPException(
+            400,
+            detail="Provide app_id as a query parameter",
+        )
     data = await refund.json()
     order_id = data["order_id"]
-    app_id = data["app_id"]
     account_id = data["account_id"]
+    app_id = validated_developer.get("app_id")
 
     transaction = await session.execute(
         select(Transaction).where(Transaction.order_id == order_id)
     )
-    if not transaction:
+    real_transaction = transaction.scalars().first()
+    if not real_transaction:
         raise HTTPException(
             status_code=404,
-            detail="Transaction not found.",
+            detail=f"Transaction with order_id {order_id} found.",
         )
 
     transaction = transaction.scalars().first()
