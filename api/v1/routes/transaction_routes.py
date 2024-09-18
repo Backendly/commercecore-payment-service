@@ -18,6 +18,8 @@ from fastapi import APIRouter, Depends, Request, Query
 from db.session import get_db
 from typing import Annotated
 from fastapi import HTTPException
+from utils import validate_developer, validate_user
+from typing import Dict, Any
 
 
 router = APIRouter(tags=["Transactions"], prefix="/api/v1")
@@ -29,9 +31,17 @@ router = APIRouter(tags=["Transactions"], prefix="/api/v1")
     status_code=201,
 )
 async def initiate_transaction(
-    payment: Request, session: AsyncSession = Depends(get_db)
+    payment: Request,
+    session: AsyncSession = Depends(get_db),
+    validated_developer: Dict[str, Any] = Depends(validate_developer),
+    validated_user: Dict[str, Any] = Depends(validate_user),
 ):
-    data = await initiate_payment_transaction(payment=payment, session=session)
+    data = await initiate_payment_transaction(
+        payment=payment,
+        session=session,
+        validated_developer=validated_developer,
+        validated_user=validated_user,
+    )
     real_data = data.model_dump()
 
     links = {
