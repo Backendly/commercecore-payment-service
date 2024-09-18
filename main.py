@@ -18,13 +18,7 @@ app = FastAPI(
     title="CommerceCore Payment Microservce",
     version="1.0.0",
 )
-r = redis.Redis(
-    host="caching-8f5a9d-corecommerce.e.aivencloud.com",
-    port=19588,
-    username="default",
-    db=0,
-    password="AVNS_sJikZfatsmaKxMFDqYS",
-)
+
 app.include_router(payment_method_router)
 app.include_router(transaction_router)
 app.include_router(account_router)
