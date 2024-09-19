@@ -5,7 +5,6 @@ from db.session import get_db
 from ..crud.refunds_crud import create_refund
 from typing import Dict, Any
 from utils import validate_developer, validate_user
-from redis_db.redis_db import redis_instance
 
 
 router = APIRouter(tags=["Refunds"], prefix="/api/v1")
