@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from db.session import create_all_tables
+from db.session import create_all_tables_and_initialize_redis_instance
 from pydantic import ValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
-import redis
+from redis_db.redis_db import init_redis
 from api.v1 import (
     account_router,
     refunds_router,
@@ -12,7 +12,7 @@ from api.v1 import (
 )
 
 app = FastAPI(
-    lifespan=create_all_tables,
+    lifespan=create_all_tables_and_initialize_redis_instance,
     docs_url="/api/v1/docs",
     redoc_url=None,
     title="CommerceCore Payment Microservce",
