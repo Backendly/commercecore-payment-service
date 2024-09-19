@@ -6,11 +6,19 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from .base import Base
 import os
+import pymysql
+from redis_db.redis_db import CustomRedis
 
 load_dotenv()
+pymysql.install_as_MySQLdb()
 
-Database_URL = os.getenv("DATABASE_URL")
-engine = create_async_engine(Database_URL, echo=True)
+DATABASE_URL = os.getenv("DATABASE_URL")
+CA_CERT_PATH = os.getenv("CA_CERT_PATH")
+engine = create_async_engine(
+    url=DATABASE_URL,
+    echo=True,
+    connect_args={},
+)
 AsyncSessionLocal = sessionmaker(
     engine,
     class_=AsyncSession,
@@ -24,8 +32,14 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
+async def redis_instance():
+    client = CustomRedis(os.getenv("REDIS_URL"))
+    await client.initialize()
+    return client
+
+
 @asynccontextmanager
-async def create_all_tables(app: FastAPI):
+async def create_all_tables_and_initialize_redis_instance(app: FastAPI):
     """Creates all tables in the database"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
