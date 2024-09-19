@@ -4,8 +4,15 @@
     {
       "src": "main.py",
       "use": "@vercel/python",
-      "config": { "pythonVersion": "3.10" }
+      "config": {
+        "pythonVersion": "3.10"
+      }
     }
   ],
-  "routes": [{ "src": "/(.*)", "dest": "main.py" }]
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
+  ]
 }
