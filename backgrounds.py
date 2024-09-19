@@ -1,17 +1,21 @@
-from redis_db.redis_db import redis_instance
 from models.transaction_model import Transaction
+
+from api.v1.schema.transaction_schema import InitiatePaymentTransaction
+from db.session import redis_instance
 
 
 async def store_user_data(key: str, value: str):
     """Store user data in Redis"""
-    await redis_instance.set(key, value)
+    client = await redis_instance()
+    await client.set(key, value)
 
 
 async def store_developer_data(key: str, value: str):
     """Store developer data in Redis"""
-    await redis_instance.set(key, value)
+    client = await redis_instance()
+    await client.set(key, value)
 
 
-def save_transaction(transaction: Transaction):
+async def save_transaction(transaction: Transaction):
     """Save transaction in Redis"""
-    redis_instance.set(transaction.transaction_id, transaction)
+    transaction_dict = transaction.model
