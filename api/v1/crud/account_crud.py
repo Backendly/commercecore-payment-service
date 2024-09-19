@@ -6,7 +6,6 @@ from datetime import datetime
 from utils import validate_developer
 from typing import Dict
 import os
-from redis_db.redis_db import redis_instance
 
 
 async def create_connected_account(
@@ -68,7 +67,7 @@ async def create_connected_account(
 async def continue_onboarding(
     data: Request,
     session: AsyncSession,
-    validated_developer: Dict[str, Any],
+    validated_developer: Dict[str, Any] | None = None,
 ):
     """Continues the onboarding process"""
     data_collected = await data.json()
