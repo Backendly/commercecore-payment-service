@@ -1,7 +1,8 @@
 from fastapi.requests import Request
 import httpx
 from fastapi import HTTPException, status, BackgroundTasks
-from redis_db.redis_db import redis_instance
+
+
 from backgrounds import store_user_data, store_developer_data
 
 
@@ -53,7 +54,12 @@ async def validate_developer(request: Request, background_tasks: BackgroundTasks
         formatted_key_developer_3 = key_developer_3.format(
             developer_id=data.get("developer_id")
         )
-
+        if request.headers.get("X-Developer-Token"):
+            background_tasks.add_task(
+                store_developer_data,
+                request.headers.get("X-Developer-Token"),
+                data["developer_id"],
+            )
         background_tasks.add_task(
             store_developer_data, formatted_key_developer_3, data["developer_id"]
         )
