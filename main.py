@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from db.session import create_all_tables_and_initialize_redis_instance
 from pydantic import ValidationError
-from starlette.middleware.base import BaseHTTPMiddleware
 from api.v1 import (
     account_router,
     refunds_router,
@@ -10,10 +9,7 @@ from api.v1 import (
     transaction_router,
 )
 import os
-import redis
 
-REDIS_URL = os.getenv("REDIS_URL")
-client = redis.Redis.from_url(REDIS_URL)
 
 app = FastAPI(
     lifespan=create_all_tables_and_initialize_redis_instance,
