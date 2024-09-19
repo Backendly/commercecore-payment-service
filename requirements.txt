@@ -48,7 +48,6 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-multipart==0.0.9
 PyYAML==6.0.2
-# redis==5.0.8
 requests==2.32.3
 rich==13.8.0
 shellingham==1.5.4
@@ -68,4 +67,3 @@ uvicorn==0.30.6
 uvloop==0.20.0
 watchfiles==0.24.0
 websockets==13.0.1
-setuptools
