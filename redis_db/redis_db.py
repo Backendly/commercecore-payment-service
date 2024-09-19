@@ -1,20 +1,19 @@
-import redis
 import aioredis
+import os
 
 
 class CustomRedis:
     """Class Implementing Redis configuration"""
 
-    def __init__(self, redis):
-        self.redis_client = redis
+    def __init__(self, client_url):
+        self.client_url = client_url
+        self.redis_client = None
 
-    @classmethod
-    async def create(cls, redis_url: str):
-        redis = await aioredis.from_url(redis_url)
-        return cls(redis)
+    async def initialize(self):
+        self.redis_client = await aioredis.from_url(self.client_url)
 
     async def set(self, key: str, value, expire: int = 3600):
-        await self.redis_client.set(key, value, expire=expire)
+        await self.redis_client.set(key, value, ex=expire)
 
     async def get(self, key: str):
         return await self.redis_client.get(key)
@@ -28,6 +27,3 @@ class CustomRedis:
             if await self.redis_client.exists(key):
                 existing_keys.append(key)
         return existing_keys
-
-
-redis_instance = CustomRedis("redis://localhost")
