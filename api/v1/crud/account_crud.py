@@ -3,8 +3,8 @@ from typing import Any
 from services.stripe_config import stripe
 from fastapi import Request, HTTPException, Depends
 from datetime import datetime
-from utils import validate_developer
 from typing import Dict
+from db.session import redis_instance
 import os
 
 
@@ -67,7 +67,7 @@ async def create_connected_account(
 async def continue_onboarding(
     data: Request,
     session: AsyncSession,
-    validated_developer: Dict[str, Any] | None = None,
+    validated_developer: Dict[str, Any] | str | None,
 ):
     """Continues the onboarding process"""
     data_collected = await data.json()
@@ -108,5 +108,5 @@ async def login_link(
             status_code=500,
             detail=f"An error occurred while creating the login link.{e}",
         )
-
+    redis_instance().set("account_id", account_id)
     return {"login_url": login_link.url}
