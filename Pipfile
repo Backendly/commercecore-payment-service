@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+setuptools = "*"
 aiomysql = "==0.2.0"
 aioredis = "==2.0.1"
 aiosqlite = "==0.20.0"
