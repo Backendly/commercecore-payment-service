@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from rq_dashboard_fast import RedisQueueDashboard
 from fastapi.responses import JSONResponse
 from db.session import create_all_tables_and_initialize_redis_instance
 from pydantic import ValidationError
