@@ -13,9 +13,11 @@ load_dotenv()
 pymysql.install_as_MySQLdb()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+T_DATABASE = os.getenv("T_DATABASE")
 CA_CERT_PATH = os.getenv("CA_CERT_PATH")
+
 engine = create_async_engine(
-    url=DATABASE_URL,
+    url=T_DATABASE,
     echo=True,
     connect_args={},
 )
@@ -26,16 +28,14 @@ AsyncSessionLocal = sessionmaker(
 )
 
 
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_db():
     """Returns a new session"""
     async with AsyncSessionLocal() as session:
         yield session
 
 
-async def redis_instance():
-    client = CustomRedis(os.getenv("REDIS_URL"))
-    await client.initialize()
-    return client
+def redis_instance():
+    return CustomRedis()
 
 
 @asynccontextmanager
