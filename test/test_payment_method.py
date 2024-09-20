@@ -1,4 +1,4 @@
-from main import app
+from api.main import app
 from httpx import AsyncClient, ASGITransport
 import pytest
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
