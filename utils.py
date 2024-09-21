@@ -8,7 +8,7 @@ from backgrounds import store_user_data, store_developer_data
 
 async def validate_developer(request: Request, background_tasks: BackgroundTasks):
     async with httpx.AsyncClient() as client:
-        client.base_url = "http://127.0.0.1:8080/api/v1/"
+        client.base_url = "https://mock-auth.onrender.com/api/v1/"
         developer_token = request.headers.get("X-Developer-Token")
         app_id = request.headers.get("X-APP-ID")
         headers_developer = {}
@@ -33,7 +33,7 @@ async def validate_developer(request: Request, background_tasks: BackgroundTasks
 
 async def validate_user(request: Request, background_tasks: BackgroundTasks):
     async with httpx.AsyncClient() as client:
-        client.base_url = "http://127.0.0.1:8080/api/v1/"
+        client.base_url = "https://mock-auth.onrender.com/api/v1/"
         user_id = request.headers.get("X-User-ID")
         app_id = request.headers.get("X-App-ID")
         headers_user = {}
