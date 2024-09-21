@@ -13,7 +13,7 @@ load_dotenv()
 pymysql.install_as_MySQLdb()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-T_DATABASE = os.getenv("T_DATABASE")
+T_DATABASE = os.getenv("DATABASE_URL")
 CA_CERT_PATH = os.getenv("CA_CERT_PATH")
 
 engine = create_async_engine(
