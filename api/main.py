@@ -8,6 +8,7 @@ from api.v1 import (
     refunds_router,
     payment_method_router,
     transaction_router,
+    webhooks_router,
 )
 import os
 
@@ -24,6 +25,7 @@ app.include_router(payment_method_router)
 app.include_router(transaction_router)
 app.include_router(account_router)
 app.include_router(refunds_router)
+app.include_router(webhooks_router)
 
 
 async def error_response_structure(
