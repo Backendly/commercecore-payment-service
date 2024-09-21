@@ -1,7 +1,6 @@
 from models.transaction_model import Transaction
 from api.v1.schema.transaction_schema import InitiatePaymentTransaction
 from db.session import redis_instance
-from db.session import get_db
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
