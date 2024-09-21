@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from rq_dashboard_fast import RedisQueueDashboard
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from db.session import create_all_tables_and_initialize_redis_instance
 from pydantic import ValidationError
 from api.v1 import (
@@ -20,7 +21,7 @@ app = FastAPI(
     title="CommerceCore Payment Microservce",
     version="1.0.0",
 )
-
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True)
 app.include_router(payment_method_router)
 app.include_router(transaction_router)
 app.include_router(account_router)
