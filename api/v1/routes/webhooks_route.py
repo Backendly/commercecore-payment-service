@@ -28,7 +28,7 @@ async def create_webhook(request: Request):
         client = redis_instance()
         client.publish("new_order", json.dumps(payment_intent))
 
-    if event["type"] == "payment_intent.succeeded":
+    if event["type"] == "payment_intent.created":
         payment_intent = event["data"]["object"]
         client = redis_instance()
         client.publish("new_order", json.dumps(payment_intent))
