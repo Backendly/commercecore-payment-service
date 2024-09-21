@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request
-from rq_dashboard_fast import RedisQueueDashboard
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from db.session import create_all_tables_and_initialize_redis_instance
+from datetime import datetime
 from pydantic import ValidationError
 from api.v1 import (
     account_router,
@@ -103,3 +103,37 @@ async def handle_method_not_allowed(request: Request, exc):
             "Method Not Allowed",
         ),
     )
+
+
+@app.get("/")
+async def home():
+    return RedirectResponse(url="/api/v1")
+
+
+@app.get("/api/v1")
+async def root():
+    return {
+        "message": "Welcome to CommerceCore Payment Service API",
+        "version": "v1",
+        "timpstamp": str(datetime.now()),
+        "starter_endpoints": {
+            "create_connected_account": "/api/v1/connected-accounts",
+            "continue_onboarding": "/api/v1/connected-accounts/onboarding",
+            "login_account_dashboard": "/api/v1/connected-accounts/login",
+            "create_transaction": "/api/v1/transactions",
+            "confirm_transaction": "/api/v1/transactions/confirm",
+            "request_refund": "/api/v1/refunds",
+        },
+        "documentation": "https://documenter.getpostman.com/view/36378381/2sAXqtb23",
+    }
+
+
+@app.get("/api/v1/status")
+async def status():
+    return {
+        "status": "ok",
+        "service": "The Payment Service",
+        "timestamp": str(datetime.now()),
+        "base_url": "https://commercecore-payment-service.onrender.com/api/v1",
+        "database_status": "connected",
+    }
