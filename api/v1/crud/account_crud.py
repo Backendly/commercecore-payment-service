@@ -131,3 +131,30 @@ async def delete_connected_account(
         raise HTTPException(status_code=401, detail="Not the Owner of account")
 
     stripe.Account.delete(account_id)
+
+
+async def get_connected_account(
+    account_id: str,
+    data: Request,
+    session: AsyncSession,
+    validated_developer: Dict[str, Any],
+):
+    developer_id = (
+        validated_developer.get("developer_id")
+        if type(validated_developer) == dict
+        else validated_developer
+    )
+    account = stripe.Account.retrieve(account_id)
+    if (
+        not account.get("metadata")
+        or account["metadata"].get("developer_id") != developer_id
+    ):
+        raise HTTPException(status_code=401, detail="Not the Owner of account")
+    return {
+        "account_id": account_id,
+        "metadata": account["metadata"],
+        "email": account["email"],
+        "capabilities": account["capabilities"],
+        "created": account["created"],
+        "dashboard_name": account["settings"]["dashboard"]["display_name"],
+    }
