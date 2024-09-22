@@ -10,6 +10,7 @@ from ..crud.account_crud import (
     create_connected_account,
     continue_onboarding,
     login_link,
+    delete_connected_account,
 )
 from utils import validate_developer
 from typing import Dict, Any
@@ -119,3 +120,20 @@ async def connected_account_login(
 
     meta = {"status_code": 201}
     return ConnectedAccountResponse(links=links, meta=meta, data=data_response)
+
+
+@router.delete("/connected-accounts/{id}", status_code=204)
+async def connected_accounts_delete(
+    id: str,
+    data: Request,
+    session: AsyncSession = Depends(get_db),
+    validated_developer: Dict[str, Any] = Depends(validate_developer),
+):
+    """delete connected accounts"""
+    await delete_connected_account(
+        account_id=id,
+        data=data,
+        session=session,
+        validated_developer=validated_developer,
+    )
+    return HTTPException(status_code=204, detail="Deleted")
