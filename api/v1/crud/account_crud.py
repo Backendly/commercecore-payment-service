@@ -110,3 +110,24 @@ async def login_link(
         )
     redis_instance().set("account_id", account_id)
     return {"login_url": login_link.url}
+
+
+async def delete_connected_account(
+    account_id: str,
+    data: Request,
+    session: AsyncSession,
+    validated_developer: Dict[str, Any],
+):
+    developer_id = (
+        validated_developer.get("developer_id")
+        if type(validated_developer) == dict
+        else validated_developer
+    )
+    account = stripe.Account.retrieve(account_id)
+    if (
+        not account.get("metadata")
+        or account["metadata"].get("developer_id") != developer_id
+    ):
+        raise HTTPException(status_code=401, detail="Not the Owner of account")
+
+    stripe.Account.delete(account_id)
