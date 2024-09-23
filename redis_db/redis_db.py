@@ -27,3 +27,8 @@ class CustomRedis:
 
     def publish(self, channel: str, message: str):
         self.client_url.publish(channel, message)
+
+    def subscribe(self, channel: str):
+        pubsub = self.client_url.pubsub()
+        pubsub.subscribe(channel)
+        return pubsub
