@@ -12,7 +12,12 @@ from api.v1 import (
     webhooks_router,
 )
 import os
+from jobs.payment_jobs import recieve_orders
+from redis import Redis
+from rq import Queue
 
+queue = Queue(connection=Redis.from_url(os.getenv("REDIS_URL")))
+queue.enqueue(recieve_orders)
 
 app = FastAPI(
     lifespan=create_all_tables_and_initialize_redis_instance,
