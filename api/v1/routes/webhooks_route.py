@@ -5,6 +5,7 @@ from services.stripe_config import stripe
 from fastapi import HTTPException
 from db.session import redis_instance
 import json
+from rq import Queue
 import os
 
 router = APIRouter(tags=["webhooks"], prefix="/api/v1")
@@ -24,11 +25,17 @@ async def create_webhook(request: Request):
         raise HTTPException(status_code=400, detail="Invalid signature")
 
     if event["type"] == "payment_intent.succeeded":
-        payment_intent = event["data"]["object"]
+        order_id = event["data"]["object"]["metadata"]["order_id"]
+        status = event["data"]["object"]["status"]
         client = redis_instance()
-        client.publish("payment_status", json.dumps(payment_intent))
+        payload = {"order_id": order_id, "status": status}
+        client.publish("payment_status", json.dumps(payload))
 
     if event["type"] == "payment_intent.created":
-        payment_intent = event["data"]["object"]
+        order_id = event["data"]["object"]["metadata"]["order_id"]
+        payload = {
+            "order_id": order_id,
+            "payment_intent_id": event["data"]["object"]["id"],
+        }
         client = redis_instance()
-        client.publish("payment_status", json.dumps(payment_intent))
+        client.publish("payment_status", json.dumps(payload))
