@@ -35,7 +35,7 @@ async def create_webhook(request: Request):
         order_id = event["data"]["object"]["metadata"]["order_id"]
         payload = {
             "order_id": order_id,
-            "payment_intent_id": event["data"]["object"]["id"],
+            "status": "created",
         }
         client = redis_instance()
         client.publish("payment_status", json.dumps(payload))
