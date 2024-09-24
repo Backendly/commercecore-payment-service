@@ -12,11 +12,9 @@ from api.v1 import (
     webhooks_router,
 )
 import os
-from jobs.payment_jobs import recieve_orders
 from redis import Redis
-from rq import Queue, Worker, Retry, Connection
 import uvicorn
-import multiprocessing
+from jobs.payment_jobs import receive_orders
 
 app = FastAPI(
     lifespan=create_all_tables,
@@ -25,16 +23,17 @@ app = FastAPI(
     title="CommerceCore Payment Microservce",
     version="1.0.0",
 )
+
+
+receive_orders.delay()
+
+
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True)
 app.include_router(payment_method_router)
 app.include_router(transaction_router)
 app.include_router(account_router)
 app.include_router(refunds_router)
 app.include_router(webhooks_router)
-
-connection = Redis.from_url(os.getenv("REDIS_URL"))
-queue = Queue("default", connection=connection)
-queue.enqueue(recieve_orders, Retry(max=3, interval=[10, 30, 60]), timeout=1800)
 
 
 async def error_response_structure(
