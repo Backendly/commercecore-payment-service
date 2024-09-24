@@ -1,28 +1,27 @@
-from rq import Queue
 from db.session import redis_instance
 from services.stripe_config import stripe
 from fastapi import HTTPException
-import os
 import json
-import math
-from rq import Queue
 import logging
+from celery_config import celery_app
 
 
-async def recieve_orders(*args, **kwargs):
-    """Recieves orders from the payment_status channel"""
+@celery_app.task(bind=True)
+def receive_orders(self):
+    """Receives orders from the payment_status channel (synchronously)"""
     client = redis_instance()
     pubsub = client.subscribe("payment_order_created")
     try:
         for message in pubsub.listen():
             if message["type"] == "message":
                 data = json.loads(message["data"])
-                await process_order(data)
+                process_order.delay(data)
     except Exception as e:
-        logging.error(f"Error in receive_orders: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"{e}")
 
 
-async def process_order(data):
+@celery_app.task(bind=True)
+def process_order(self, data):
     """Processes the order"""
     order_id = data.get("order_id")
     amount = data.get("total")
@@ -37,10 +36,11 @@ async def process_order(data):
             currency="usd",
             metadata={
                 "order_id": order_id,
-                developer_id: developer_id,
-                app_id: app_id,
-                user_id: user_id,
+                "developer_id": developer_id,
+                "app_id": app_id,
+                "user_id": user_id,
             },
         )
     except stripe.error.StripeError as e:
-        raise HTTPException(status_code=400, detail=f"{e}")
+        logging.error(f"Stripe error: {str(e)}")
+        self.retry(exc=e, countdown=60)
