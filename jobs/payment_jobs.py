@@ -9,7 +9,7 @@ from rq import Queue
 import logging
 
 
-async def recieve_orders():
+async def recieve_orders(*args, **kwargs):
     """Recieves orders from the payment_status channel"""
     client = redis_instance()
     pubsub = client.subscribe("payment_order_created")
@@ -17,11 +17,11 @@ async def recieve_orders():
         if message["type"] == "message":
             data = json.loads(message["data"])
             order_id = data.get("order_id")
-            amount = data.get("amount")
+            amount = data.get("total")
             user_id = data.get("user_id")
             developer_id = data.get("developer_id")
             app_id = data.get("app_id")
-            amount = round(int(amount)) * 100
+            amount = round(float(amount) * 100)
             try:
                 stripe.PaymentIntent.create(
                     stripe_account="acct_1Q1uwPFKeQfUzMzl",
@@ -34,6 +34,5 @@ async def recieve_orders():
                         user_id: user_id,
                     },
                 )
-                logging.info(f"Received message: {message['data']}")
             except stripe.error.StripeError as e:
-                logging.error(f"Error: {e}")
+                raise HTTPException(status_code=400, detail=f"{e}")
