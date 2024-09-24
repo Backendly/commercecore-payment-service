@@ -145,17 +145,3 @@ async def status():
         "base_url": "https://commercecore-payment-service.onrender.com/api/v1",
         "database_status": "connected",
     }
-
-
-def run_fastapi():
-    """starts the fastapi server"""
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app=app, host="0.0.0.0", port=port)
-
-
-def run_rq_worker():
-    """starts a worker for the redis queue"""
-
-    with Connection(connection):
-        worker = Worker(["default"])
-        worker.work()
