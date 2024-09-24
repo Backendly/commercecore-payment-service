@@ -6,9 +6,6 @@ import logging
 from celery_config import celery_app
 
 
-processed_orders = set()  # Keep track of processed order IDs
-
-
 @celery_app.task(bind=True)
 def receive_orders(self):
     """Receives orders from the payment_status channel (synchronously)"""
@@ -18,15 +15,8 @@ def receive_orders(self):
         for message in pubsub.listen():
             if message["type"] == "message":
                 data = json.loads(message["data"])
-                order_id = data.get("order_id")
-
-                if order_id not in processed_orders:
-                    processed_orders.add(order_id)  # Mark as processed
-                    process_order.delay(data)  # Enqueue the processing task
-                else:
-                    logging.info(f"Order {order_id} has already been processed.")
+                process_order.delay(data)
     except Exception as e:
-        logging.error(f"Error in receive_orders: {str(e)}")
         raise HTTPException(status_code=400, detail=f"{e}")
 
 
