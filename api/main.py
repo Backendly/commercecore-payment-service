@@ -145,3 +145,9 @@ async def status():
         "base_url": "https://commercecore-payment-service.onrender.com/api/v1",
         "database_status": "connected",
     }
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "your_app_name:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000))
+    )
