@@ -1,9 +1,3 @@
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,6 +31,10 @@ app.include_router(transaction_router)
 app.include_router(account_router)
 app.include_router(refunds_router)
 app.include_router(webhooks_router)
+
+connection = Redis.from_url(os.getenv("REDIS_URL"))
+queue = Queue("default", connection=connection)
+queue.enqueue(recieve_orders, Retry(max=3, interval=[10, 30, 60]))
 
 
 async def error_response_structure(
@@ -147,27 +145,3 @@ async def status():
         "base_url": "https://commercecore-payment-service.onrender.com/api/v1",
         "database_status": "connected",
     }
-
-
-def run_fastapi():
-    """starts the fastapi server"""
-    uvicorn.run(app=app, host="0.0.0.0", port=8000)
-
-
-def run_rq_worker():
-    """starts a worker for the redis queue"""
-    connection = Redis.from_url(os.getenv("REDIS_URL"))
-    queue = Queue("default", connection=connection)
-    queue.enqueue(recieve_orders, Retry(max=3, interval=[10, 30, 60]))
-    with Connection(connection):
-        worker = Worker(["default"])
-        worker.work()
-
-
-if __name__ == "__main__":
-    fastapi_process = multiprocessing.Process(target=run_fastapi)
-    rq_worker_process = multiprocessing.Process(target=run_rq_worker)
-    fastapi_process.start()
-    rq_worker_process.start()
-    fastapi_process.join()
-    rq_worker_process.join()
