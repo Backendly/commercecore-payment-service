@@ -1,7 +1,13 @@
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
-from db.session import create_all_tables_and_initialize_redis_instance
+from db.session import create_all_tables
 from datetime import datetime
 from pydantic import ValidationError
 from api.v1 import (
@@ -14,13 +20,12 @@ from api.v1 import (
 import os
 from jobs.payment_jobs import recieve_orders
 from redis import Redis
-from rq import Queue
-
-queue = Queue(connection=Redis.from_url(os.getenv("REDIS_URL")))
-queue.enqueue(recieve_orders)
+from rq import Queue, Worker, Retry, Connection
+import uvicorn
+import multiprocessing
 
 app = FastAPI(
-    lifespan=create_all_tables_and_initialize_redis_instance,
+    lifespan=create_all_tables,
     docs_url="/api/v1/docs",
     redoc_url=None,
     title="CommerceCore Payment Microservce",
@@ -142,3 +147,27 @@ async def status():
         "base_url": "https://commercecore-payment-service.onrender.com/api/v1",
         "database_status": "connected",
     }
+
+
+def run_fastapi():
+    """starts the fastapi server"""
+    uvicorn.run(app=app, host="0.0.0.0", port=8000)
+
+
+def run_rq_worker():
+    """starts a worker for the redis queue"""
+    connection = Redis.from_url(os.getenv("REDIS_URL"))
+    queue = Queue("default", connection=connection)
+    queue.enqueue(recieve_orders, Retry(max=3, interval=[10, 30, 60]))
+    with Connection(connection):
+        worker = Worker(["default"])
+        worker.work()
+
+
+if __name__ == "__main__":
+    fastapi_process = multiprocessing.Process(target=run_fastapi)
+    rq_worker_process = multiprocessing.Process(target=run_rq_worker)
+    fastapi_process.start()
+    rq_worker_process.start()
+    fastapi_process.join()
+    rq_worker_process.join()
