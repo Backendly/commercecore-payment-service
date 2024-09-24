@@ -34,7 +34,7 @@ app.include_router(webhooks_router)
 
 connection = Redis.from_url(os.getenv("REDIS_URL"))
 queue = Queue("default", connection=connection)
-queue.enqueue(recieve_orders, Retry(max=3, interval=[10, 30, 60]))
+queue.enqueue(recieve_orders, Retry(max=3, interval=[10, 30, 60]), timeout=1800)
 
 
 async def error_response_structure(
