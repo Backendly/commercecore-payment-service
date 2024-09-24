@@ -73,6 +73,7 @@ rq = "*"
 rq-dashboard-fast = "*"
 gunicorn = "*"
 rq-dashboard = "*"
+celery = "*"
 
 [dev-packages]
 
