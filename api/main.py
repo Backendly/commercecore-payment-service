@@ -148,6 +148,4 @@ async def status():
 
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "your_app_name:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000))
-    )
+    uvicorn.run("api.main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
