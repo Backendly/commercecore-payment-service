@@ -13,11 +13,10 @@ load_dotenv()
 pymysql.install_as_MySQLdb()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-T_DATABASE = os.getenv("DATABASE_URL")
 CA_CERT_PATH = os.getenv("CA_CERT_PATH")
 
 engine = create_async_engine(
-    url=T_DATABASE,
+    url=DATABASE_URL,
     echo=True,
     connect_args={},
 )
@@ -39,7 +38,7 @@ def redis_instance():
 
 
 @asynccontextmanager
-async def create_all_tables_and_initialize_redis_instance(app: FastAPI):
+async def create_all_tables(app: FastAPI):
     """Creates all tables in the database"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
