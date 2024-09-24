@@ -21,4 +21,4 @@ celery_app.conf.update(
     enable_utc=True,
 )
 
-from jobs.payment_jobs import receive_orders
+from jobs import payment_jobs
