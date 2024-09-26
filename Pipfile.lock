@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5ba661530d39f91ea810bc36da5cdd7b52ca91e9406e7062508e66f8f968d05f"
+            "sha256": "fdd2335ac256ed5f340dd7aa05f6a6a01006aee84c829ea59953497304f1640e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -425,6 +425,15 @@
             "markers": "python_version >= '3.8'",
             "version": "==3.0.3"
         },
+        "flower": {
+            "hashes": [
+                "sha256:5ab717b979530770c16afb48b50d2a98d23c3e9fe39851dcf6bc4d01845a02a0",
+                "sha256:9db2c621eeefbc844c8dd88be64aef61e84e2deb29b271e02ab2b5b9f01068e2"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==2.0.1"
+        },
         "freezegun": {
             "hashes": [
                 "sha256:b29dedfcda6d5e8e083ce71b2b542753ad48cfec44037b3fc79702e2980a89e9",
@@ -576,6 +585,14 @@
             "index": "pypi",
             "markers": "python_version >= '3.8'",
             "version": "==0.27.2"
+        },
+        "humanize": {
+            "hashes": [
+                "sha256:06b6eb0293e4b85e8d385397c5868926820db32b9b654b932f57fa41c23c9978",
+                "sha256:39e7ccb96923e732b5c2e27aeaa3b10a8dfeeba3eb965ba7b74a3eb0e30040a6"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==4.10.0"
         },
         "idna": {
             "hashes": [
@@ -854,6 +871,14 @@
             "index": "pypi",
             "markers": "python_version >= '3.8'",
             "version": "==1.5.0"
+        },
+        "prometheus-client": {
+            "hashes": [
+                "sha256:4fa6b4dd0ac16d58bb587c04b1caae65b8c5043e85f778f42f5f632f6af2e166",
+                "sha256:96c83c606b71ff2b0a433c98889d275f51ffec6c5e267de37c7a2b5c9aa9233e"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==0.21.0"
         },
         "prompt-toolkit": {
             "hashes": [
@@ -1169,12 +1194,12 @@
         },
         "rq-dashboard-fast": {
             "hashes": [
-                "sha256:771501a8b6f05b73870afb07ee1d0317360eaa10cd52f4c7707eafad2839ce0c",
-                "sha256:9a226536175d03fe38ebf4a885f733c002ec06c824a18f299b22fa5e5951e29e"
+                "sha256:1103983c04d1a1b46263af2373192994289f12f4ff6aceefa55cf5c33dc0102a",
+                "sha256:411f57b3ece887b1d2853c52c1c1a70388f8104ff3969cefa0a686e0c9245484"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.10' and python_version < '4.0'",
-            "version": "==0.5.8"
+            "version": "==0.5.9"
         },
         "rq-scheduler": {
             "hashes": [
@@ -1309,6 +1334,23 @@
             "index": "pypi",
             "markers": "python_version >= '3.7'",
             "version": "==2.0.1"
+        },
+        "tornado": {
+            "hashes": [
+                "sha256:163b0aafc8e23d8cdc3c9dfb24c5368af84a81e3364745ccb4427669bf84aec8",
+                "sha256:25486eb223babe3eed4b8aecbac33b37e3dd6d776bc730ca14e1bf93888b979f",
+                "sha256:454db8a7ecfcf2ff6042dde58404164d969b6f5d58b926da15e6b23817950fc4",
+                "sha256:613bf4ddf5c7a95509218b149b555621497a6cc0d46ac341b30bd9ec19eac7f3",
+                "sha256:6d5ce3437e18a2b66fbadb183c1d3364fb03f2be71299e7d10dbeeb69f4b2a14",
+                "sha256:8ae50a504a740365267b2a8d1a90c9fbc86b780a39170feca9bcc1787ff80842",
+                "sha256:92d3ab53183d8c50f8204a51e6f91d18a15d5ef261e84d452800d4ff6fc504e9",
+                "sha256:a02a08cc7a9314b006f653ce40483b9b3c12cda222d6a46d4ac63bb6c9057698",
+                "sha256:b24b8982ed444378d7f21d563f4180a2de31ced9d8d84443907a0a64da2072e7",
+                "sha256:d9a566c40b89757c9aa8e6f032bcdb8ca8795d7c1a9762910c722b1635c9de4d",
+                "sha256:e2e20b9113cd7293f164dc46fffb13535266e713cdb87bd2d15ddb336e96cfc4"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==6.4.1"
         },
         "trio": {
             "hashes": [
