@@ -51,7 +51,7 @@ To get started with the CommerceCore Payment API, follow the instructions below 
 5. **Run the server:**
 
    ```bash
-   uvicorn api.app:app --reload
+   uvicorn api.main:app --reload
    ```
 
 ## Usage
