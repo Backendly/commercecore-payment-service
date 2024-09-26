@@ -62,7 +62,7 @@ Once the server is running, you can interact with the API using tools like [Post
 
 You can test the API endpoints using Postman. Import the collection directly using the following link:
 
-[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://documenter.getpostman.com/view/34635068/2sAXjJ6DG6)
+[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://[documenter.getpostman.com/view/34635068/2sAXjJ6DG6](https://corecommerce.postman.co/workspace/a5bf5653-a58d-4835-81df-981dbf49ef52/collection/36378381-ecb64938-862b-42ff-9d04-b51c7a97d6c5))
 
 ## API Documentation
 
