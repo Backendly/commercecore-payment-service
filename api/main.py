@@ -131,7 +131,7 @@ async def root():
             "confirm_transaction": "/api/v1/transactions/confirm",
             "request_refund": "/api/v1/refunds",
         },
-        "documentation": "https://documenter.getpostman.com/view/36378381/2sAXqtb23",
+        "documentation": "https://documenter.getpostman.com/view/36378381/2sAXqtb23V",
     }
 
 
