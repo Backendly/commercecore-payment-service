@@ -66,7 +66,7 @@ You can test the API endpoints using Postman. Import the collection directly usi
 
 ## API Documentation
 
-For detailed API documentation, visit the [Postman](https://documenter.getpostman.com/view/34635068/2sAXjJ6DG6) endpoints.
+For detailed API documentation, visit the [Postman]([https://documenter.getpostman.com/view/34635068/2sAXjJ6DG6](https://corecommerce.postman.co/workspace/a5bf5653-a58d-4835-81df-981dbf49ef52/collection/36378381-ecb64938-862b-42ff-9d04-b51c7a97d6c5)) endpoints.
 
 ## License
 
