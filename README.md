@@ -1,7 +1,7 @@
 # CommerceCore Payment Service API
 
 ![RevPloy](Payment.png)
-Welcome to the CommerceCore Payment Service API! This API provides resources for managing HR activities in a company.
+Welcome to the CommerceCore Payment Service API! This API provides payment endpoint for the CommerceCore API
 
 ## Table of Contents
 
