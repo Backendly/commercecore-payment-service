@@ -39,3 +39,21 @@ async def create_webhook(request: Request):
         }
         client = redis_instance()
         client.publish("payment_status", json.dumps(payload))
+
+    if event["type"] == "payment_intent.payment_failed":
+        order_id = event["data"]["object"]["metadata"]["order_id"]
+        payload = {
+            "order_id": order_id,
+            "status": "failed",
+        }
+        client = redis_instance()
+        client.publish("payment_status", json.dumps(payload))
+
+    if event["type"] == "refund.created":
+        order_id = event["data"]["object"]["metadata"]["order_id"]
+        payload = {
+            "order_id": order_id,
+            "status": "refunded",
+        }
+        client = redis_instance()
+        client.publish("payment_status", json.dumps(payload))

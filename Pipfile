@@ -74,6 +74,7 @@ rq-dashboard-fast = "*"
 gunicorn = "*"
 rq-dashboard = "*"
 celery = "*"
+flower = "*"
 
 [dev-packages]
 
