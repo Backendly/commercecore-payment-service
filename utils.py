@@ -11,6 +11,10 @@ async def validate_developer(request: Request, background_tasks: BackgroundTasks
     async with httpx.AsyncClient() as client:
         client.base_url = os.getenv("AUTH_BASE_URL")
         developer_token = request.headers.get("X-Developer-Token")
+        if not developer_token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
+            )
         response = await client.get(
             "developer/validate-token", headers={"x-api-token": developer_token}
         )
