@@ -1,11 +1,9 @@
 from fastapi import APIRouter, Request
-import stripe.webhook
-import stripe.webhook
+from stripe import Webhook
 from services.stripe_config import stripe
 from fastapi import HTTPException
 from db.session import redis_instance
 import json
-from rq import Queue
 import os
 
 router = APIRouter(tags=["webhooks"], prefix="/api/v1")
@@ -18,7 +16,7 @@ async def create_webhook(request: Request):
     sig_header = request.headers.get("stripe-signature")
 
     try:
-        event = stripe.Webhook.construct_event(payload, sig_header, signing_secret)
+        event = Webhook.construct_event(payload, sig_header, signing_secret)
     except ValueError as e:
         raise HTTPException(status_code=400, detail="Invalid payload")
     except stripe.error.SignatureVerificationError as e:
