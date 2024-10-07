@@ -12,7 +12,7 @@ import os
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("TEST_DATABASE_URL")
+DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 engine_test = create_async_engine(DATABASE_URL, echo=True)
 AsyncSessionLocalTest = sessionmaker(
     bind=engine_test, class_=AsyncSession, expire_on_commit=False
