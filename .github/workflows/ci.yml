@@ -3,7 +3,6 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main # Runs on push to main branch
       - testing # Runs on push to testing branch
 
 jobs:
