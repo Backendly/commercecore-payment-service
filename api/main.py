@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from db.session import create_all_tables
 from datetime import datetime
-from pydantic import ValidationError
 from api.v1 import (
     account_router,
     refunds_router,
@@ -12,9 +11,18 @@ from api.v1 import (
     webhooks_router,
 )
 import os
-from redis import Redis
 import uvicorn
 from jobs.payment_jobs import receive_orders
+import sentry_sdk
+from dotenv import load_dotenv
+
+load_dotenv()
+
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN"),
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
 
 app = FastAPI(
     lifespan=create_all_tables,

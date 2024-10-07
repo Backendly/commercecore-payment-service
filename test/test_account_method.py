@@ -88,3 +88,15 @@ async def test_delete_acount(client):
     data = response.json()
     assert response.status_code == 401
     assert data == {"detail": "Not the Owner of account"}
+
+
+@pytest.mark.anyio
+async def test_get_connected_account(client):
+    """This will test the retrieval of a connected account"""
+    response = await client.get(
+        "/connected-accounts/acct_1Q2aJc2azLnUiqXE",
+        headers={"X-Developer-Token": "b9f10f7c-4743-4423-a2c0-888168864f5d"},
+    )
+    data = response.json()
+    assert response.status_code == 401
+    assert data == {"detail": "Not the Owner of account"}
