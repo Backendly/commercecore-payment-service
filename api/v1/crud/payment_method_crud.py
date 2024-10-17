@@ -1,7 +1,7 @@
 from models.payment_method_model import PaymentMethod
 from services.stripe_config import stripe
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from sqlalchemy.future import select
 from ..schema.payment_method_schema import (
     PaymentMethodCreate,
@@ -11,40 +11,40 @@ from ..schema.payment_method_schema import (
 
 
 async def create_payment_method(
-    payment_method: PaymentMethodCreate, session: AsyncSession
+    payment_method: Request,
+    session: AsyncSession,
+    validated_developer: dict,
+    validated_user: dict,
+    validated_app: dict,
 ):
     """Creates a new payment method"""
-    payment_method_dict = payment_method.model_dump()
+    developer_id = (
+        validated_developer.get("developer_id")
+        if type(validated_developer) == dict
+        else validated_developer
+    )
+    user_id = (
+        validated_user.get("user_id")
+        if type(validated_user) == dict
+        else validated_user
+    )
+    app_id = (
+        validated_app.get("app_id") if type(validated_app) == dict else validated_app
+    )
+
+    payment_method_dict = payment_method.json()
     payment_method_type = payment_method_dict["type"]
-    payment_method_details = payment_method_dict["details"]
+    preffered = payment_method_dict.get("preferred", False)
+    payment_method_id = payment_method_dict.get("payment_method_id", None)
 
-    if payment_method_type == PaymentMethodType.card:
-        try:
-            payment_method_stripe = await stripe.PaymentMethod.create(
-                type="card",
-                card={
-                    "number": payment_method_details["card_number"],
-                    "exp_month": payment_method_details["exp_month"],
-                    "exp_year": payment_method_details["exp_year"],
-                    "cvc": payment_method_details["card_cvc"],
-                },
-            )
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"An error occurred while creating the payment method.{e}",
-            )
-        new_payment_method = PaymentMethod(
-            id=payment_method_stripe["id"],
-            type=payment_method_type,
-            details={
-                "card_last_four": payment_method_stripe["last4"],
-                "card_type": payment_method_stripe["brand"],
-                "exp_month": payment_method_stripe["exp_month"],
-                "exp_year": payment_method_stripe["exp_year"],
-            },
-        )
-
+    new_payment_method = PaymentMethod(
+        payment_method_id=payment_method_id,
+        user_id=user_id,
+        app_id=app_id,
+        developer_id=developer_id,
+        type=payment_method_type,
+        preferred=preffered,
+    )
     try:
         session.add(new_payment_method)
         await session.commit()
