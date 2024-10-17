@@ -52,7 +52,12 @@ async def validate_user(request: Request, background_tasks: BackgroundTasks):
         client.base_url = os.getenv("AUTH_BASE_URL")
         user_id = request.headers.get("X-User-ID")
         app_id = request.headers.get("X-App-ID")
-        x_api_token = request.headers.get("X-Token-ID")
+        x_api_token = request.headers.get("X-Developer-ID")
+        if not user_id or not app_id or not x_api_token:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Missing required headers",
+            )
         headers_user = {
             "x-api-token": x_api_token,
             "x-app-id": app_id,
