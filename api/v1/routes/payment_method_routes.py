@@ -11,7 +11,7 @@ from ..crud.payment_method_crud import (
     get_payment_method,
     delete_payment_method,
 )
-from utils import validate_developer, validate_user
+from utils import validate_developer, validate_user, validate_app
 from ..schema.payment_method_schema import (
     PaymentMethodCreate,
     PaymentMethodInDB,
@@ -34,9 +34,18 @@ async def add_payment_method(
     request: Request,
     payment_method: PaymentMethodCreate,
     session: AsyncSession = Depends(get_db),
+    validated_developer: dict = Depends(validate_developer),
+    validated_user: dict = Depends(validate_user),
+    validated_app: dict = Depends(validate_app),
 ):
     """Creates a new payment method"""
-    data = await create_payment_method(payment_method, session=session)
+    data = await create_payment_method(
+        payment_method,
+        session=session,
+        validated_developer=validated_developer,
+        validated_user=validated_user,
+        validated_app=validated_app,
+    )
     self_link = str(request.url_for("retrieve_payment_method", id=data.id))
     return {
         "data": data,
