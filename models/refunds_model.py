@@ -1,5 +1,6 @@
 from db.base import Base, ModelBase
 from sqlalchemy import Column, String, Boolean, JSON
+from nanoid import generate
 
 
 class Refund(ModelBase, Base):
