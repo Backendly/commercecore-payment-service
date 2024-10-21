@@ -3,19 +3,15 @@ from services.stripe_config import stripe
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, Request
 from sqlalchemy.future import select
-from ..schema.payment_method_schema import (
-    PaymentMethodCreate,
-    PaymentMethodInDB,
-    PaymentMethodType,
-)
+from typing import Dict
 
 
 async def create_payment_method(
-    payment_method: Request,
+    data: Request,
     session: AsyncSession,
-    validated_developer: dict,
-    validated_user: dict,
-    validated_app: dict,
+    validated_developer: Dict | str,
+    validated_user: Dict | str,
+    validated_app: Dict | str,
 ):
     """Creates a new payment method"""
     developer_id = (
@@ -31,9 +27,8 @@ async def create_payment_method(
     app_id = (
         validated_app.get("app_id") if type(validated_app) == dict else validated_app
     )
-
-    payment_method_dict = payment_method.json()
-    payment_method_type = payment_method_dict["type"]
+    payment_method_dict = await data.json()
+    payment_method_type = payment_method_dict.get("type")
     preffered = payment_method_dict.get("preferred", False)
     payment_method_id = payment_method_dict.get("payment_method_id", None)
 
@@ -57,56 +52,3 @@ async def create_payment_method(
         )
 
     return new_payment_method
-
-
-async def get_payment_methods(session: AsyncSession, limit: int, offset: int):
-    """Returns all payment methods"""
-    result = await session.execute(select(PaymentMethod).limit(limit).offset(offset))
-    results = result.scalars().all()
-    new_results = []
-    for result in results:
-        result = PaymentMethodInDB.model_validate(result)
-        result = result.model_dump()
-        del result["details"]["card_cvc"]
-        result["details"]["card_last_four"] = result["details"]["card_number"][-4:]
-        del result["details"]["card_number"]
-        new_results.append(result)
-
-    return new_results
-
-
-async def get_payment_method(id: str, session: AsyncSession):
-    """Returns a payment method by id"""
-    result = await session.execute(
-        select(PaymentMethod).filter(PaymentMethod.id == id),
-    )
-    payment_method = result.scalars().first()
-    if not payment_method:
-        raise HTTPException(
-            status_code=404,
-            detail="Payment method not found",
-        )
-    result = payment_method
-    result = PaymentMethodInDB.model_validate(result)
-    result = result.model_dump()
-    del result["details"]["card_cvc"]
-    result["details"]["card_last_four"] = result["details"]["card_number"][-4:]
-    del result["details"]["card_number"]
-
-    return PaymentMethodInDB(**result)
-
-
-async def delete_payment_method(id: str, session: AsyncSession):
-    """Deletes a payment method"""
-    payment_method = await get_payment_method(id, session)
-    if not payment_method:
-        raise HTTPException(
-            status_code=404,
-            detail="Payment method not found",
-        )
-    payment_method = await session.execute(
-        select(PaymentMethod).filter(PaymentMethod.id == id)
-    )
-    payment_method = payment_method.scalars().first()
-    await session.delete(payment_method)
-    await session.commit()
