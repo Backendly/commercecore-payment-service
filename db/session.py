@@ -12,7 +12,7 @@ from redis_db.redis_db import CustomRedis
 load_dotenv()
 pymysql.install_as_MySQLdb()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("T_DATABASE", "DATABASE_URL")
 CA_CERT_PATH = os.getenv("CA_CERT_PATH")
 
 engine = create_async_engine(
