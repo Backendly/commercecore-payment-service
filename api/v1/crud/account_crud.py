@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
 from services.stripe_config import stripe
-from fastapi import Request, HTTPException, Depends
+from fastapi import Request, HTTPException
 from datetime import datetime
 from typing import Dict
 from db.session import redis_instance
