@@ -4,6 +4,9 @@ from fastapi import HTTPException
 import json
 import logging
 from celery_config import celery_app
+from celery_config import LocalSession
+from models.payment_method_model import PaymentMethod
+from models.payment_method_model import ConnectedAccount
 
 
 @celery_app.task(bind=True)
@@ -30,8 +33,15 @@ def process_order(self, data):
     app_id = data.get("app_id")
     amount = round(float(amount) * 100)
     try:
-        stripe.PaymentIntent.create(
-            stripe_account="acct_1Q1uwPFKeQfUzMzl",
+        session = LocalSession()
+        account_id = (
+            session.query(ConnectedAccount)
+            .filter_by(developer_id=developer_id)
+            .first()
+            .account_id
+        )
+        payment_intent = stripe.PaymentIntent.create(
+            stripe_account=account_id,
             amount=amount,
             currency="usd",
             metadata={
@@ -41,6 +51,39 @@ def process_order(self, data):
                 "user_id": user_id,
             },
         )
+        confirm_payment.delay(payment_intent)
     except stripe.error.StripeError as e:
         logging.error(f"Stripe error: {str(e)}")
         self.retry(exc=e, countdown=60)
+    finally:
+        session.close()
+
+
+@celery_app.task(bind=True)
+def confirm_payment(self, data):
+    """Confirms the payment"""
+    try:
+        developer_id = data.get("metadata").get("developer_id")
+        user_id = data.get("metadata").get("user_id")
+        app_id = data.get("metadata").get("app_id")
+        session = LocalSession()
+        payment_method_id = (
+            session.query(PaymentMethod)
+            .filter_by(
+                developer_id=developer_id,
+                app_id=app_id,
+                user_id=user_id,
+                preferred=True,
+            )
+            .first()
+            .payment_method_id
+        )
+        payment_intent = stripe.PaymentIntent.confirm(
+            data.get("id"), payment_method=payment_method_id
+        )
+    except stripe.error.StripeError as e:
+        logging.error(f"Stripe error: {str(e)}")
+        self.retry(exc=e, countdown=60)
+
+    finally:
+        session.close()
