@@ -1,6 +1,17 @@
+from dotenv import load_dotenv
+import pymysql
 import os
 import ssl
 from celery import Celery
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+pymysql.install_as_MySQLdb()
+load_dotenv()
+
+DATABASE_URL = os.getenv("T_DATABASE", "DATABASE_URL")
+engine = create_engine(DATABASE_URL, echo=True)
+LocalSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 celery_app = Celery(
