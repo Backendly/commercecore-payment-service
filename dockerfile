@@ -3,12 +3,10 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy the Pipfile and Pipfile.lock first to cache dependencies
-COPY Pipfile Pipfile.lock /app/
+COPY requirements.txt /app/
 
 # Install pipenv
-RUN pip install pipenv
-
-RUN pipenv install --deploy --ignore-pipfile
+RUN pip install -r requirements.txt
 
 # Copy the rest of the application files
 COPY . /app

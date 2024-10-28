@@ -12,7 +12,6 @@ from api.v1 import (
 )
 import os
 import uvicorn
-from jobs.payment_jobs import receive_orders
 import sentry_sdk
 from dotenv import load_dotenv
 
@@ -33,7 +32,7 @@ app = FastAPI(
 )
 
 
-receive_orders.delay()
+# recieve_orders.delay()
 
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True)

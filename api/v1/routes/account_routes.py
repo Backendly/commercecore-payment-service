@@ -49,8 +49,12 @@ async def connected_account(
                 data, background_tasks=background_tasks
             )
             data_response = await create_connected_account(
-                data, session, validated_developer
+                data,
+                session,
+                validated_developer,
+                background_tasks=background_tasks,
             )
+
             onboarding_url = data_response["onboarding_url"]
             del data_response["onboarding_url"]
             links = {

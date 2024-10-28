@@ -33,8 +33,8 @@ async def validate_developer(request: Request, background_tasks: BackgroundTasks
 async def validate_app(request: Request, background_tasks: BackgroundTasks):
     async with httpx.AsyncClient() as client:
         client.base_url = os.getenv("AUTH_BASE_URL")
-        app_id = request.headers.get("x-APP-ID")
-        x_api_token = request.headers.get("X-Develoer-Token")
+        app_id = request.headers.get("X-App-ID")
+        x_api_token = request.headers.get("X-Developer-Token")
         response = await client.get(
             f"app/validate-app/{app_id}", headers={"x-api-token": x_api_token}
         )
@@ -52,7 +52,7 @@ async def validate_user(request: Request, background_tasks: BackgroundTasks):
         client.base_url = os.getenv("AUTH_BASE_URL")
         user_id = request.headers.get("X-User-ID")
         app_id = request.headers.get("X-App-ID")
-        x_api_token = request.headers.get("X-Token-ID")
+        x_api_token = request.headers.get("X-Developer-Token")
         headers_user = {
             "x-api-token": x_api_token,
             "x-app-id": app_id,

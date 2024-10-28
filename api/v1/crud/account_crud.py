@@ -1,17 +1,20 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
 from services.stripe_config import stripe
-from fastapi import Request, HTTPException, Depends
+from fastapi import Request, HTTPException
 from datetime import datetime
 from typing import Dict
 from db.session import redis_instance
 import os
+from fastapi.background import BackgroundTasks
+from backgrounds import save_connected_account
 
 
 async def create_connected_account(
     data: Request,
     session: AsyncSession,
     validated_developer: Dict[str, Any],
+    background_tasks: BackgroundTasks,
 ):
     """Creates a connected account"""
     data = await data.json()
@@ -45,6 +48,8 @@ async def create_connected_account(
             status_code=500,
             detail=f"An error occurred while creating the connected account.{e}",
         )
+    data["account_id"] = account["id"]
+    background_tasks.add_task(save_connected_account, data, session, developer_id)
 
     full_onboard_url = stripe.AccountLink.create(
         account=account["id"],
