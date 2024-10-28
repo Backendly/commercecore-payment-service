@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 pymysql.install_as_MySQLdb()
 load_dotenv()
 
-DATABASE_URL = os.getenv("T_DATABASE", "DATABASE_URL")
+DATABASE_URL = os.getenv("CELERY_DATABASE_URL")
 engine = create_engine(DATABASE_URL, echo=True)
 LocalSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -20,7 +20,7 @@ celery_app = Celery(
     backend=os.getenv("CELERY_REDIS_URL"),
 )
 
-celery_app.conf.broker_use_ssl = {"ssl_cert_reqs": ssl.CERT_REQUIRED}
+# celery_app.conf.broker_use_ssl = {"ssl_cert_reqs": ssl.CERT_REQUIRED}
 broker_connection_retry_on_startup = True
 
 
