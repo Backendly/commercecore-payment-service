@@ -1,0 +1,7 @@
+__pycache__/
+.env
+.commercecore-payment-service/
+.vscode
+.env
+node_modules
+.payment-service
